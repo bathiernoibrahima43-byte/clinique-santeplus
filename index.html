@@ -1,0 +1,3293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinique SantéPlus — MediCore Pro</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #eef3f9;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(13, 148, 136, 0.10) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(15, 76, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(99, 102, 241, 0.06) 0px, transparent 50%);
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #eef2f6; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      box-shadow: 0 12px 32px -12px rgba(15, 23, 42, 0.08);
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease, border-color 0.24s ease;
+    }
+
+    .kpi-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0F4C81, #0D9488);
+      opacity: 0.85;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 38px -14px rgba(13, 148, 136, 0.22);
+      border-color: rgba(13, 148, 136, 0.45);
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, #091e36 0%, #0F4C81 52%, #0D9488 100%);
+      box-shadow: 0 18px 36px -14px rgba(15, 76, 129, 0.35);
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+        padding: 24px !important;
+        color: #0f172a !important;
+      }
+    }
+  </style>
+</head>
+<body class="text-slate-800 font-sans antialiased selection:bg-teal-100 selection:text-teal-900">
+
+  <!-- Zone dédiée à l'impression (Fiche Patient ou Rapport Statistique) -->
+  <div id="print-area" class="hidden"></div>
+
+  <!-- Écran de Connexion Sécurisé -->
+  <div id="login-screen" class="fixed inset-0 z-50 bg-gradient-to-br from-slate-950 via-[#0b2545] to-teal-950/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 space-y-6 border border-white/60 my-auto">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0F4C81] via-teal-600 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-teal-600/25">
+            <i class="fa-solid fa-heart-pulse text-2xl"></i>
+          </div>
+          <div>
+            <h2 class="font-extrabold text-lg sm:text-xl text-slate-900">Clinique <span class="bg-gradient-to-r from-[#0F4C81] to-teal-600 bg-clip-text text-transparent">SantéPlus</span></h2>
+            <p class="text-xs font-semibold text-teal-700">MediCore Pro • Portail Médical Sécurisé</p>
+          </div>
+        </div>
+        <!-- Sélecteur de langue sur l'écran de connexion -->
+        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <button type="button" onclick="setLanguage('fr')" data-lang-btn="fr" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">FR</button>
+          <button type="button" onclick="setLanguage('en')" data-lang-btn="en" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">EN</button>
+          <button type="button" onclick="setLanguage('pt')" data-lang-btn="pt" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">PT</button>
+        </div>
+      </div>
+
+      <div>
+        <h3 id="login-title" class="text-xl font-bold text-slate-900">Connexion au portail médical</h3>
+        <p id="login-subtitle" class="text-xs text-slate-500 mt-1">Saisissez vos identifiants ou cliquez sur un profil de démonstration ci-dessous.</p>
+      </div>
+
+      <!-- Accès rapide 1-clic -->
+      <div class="space-y-2">
+        <p id="login-quick-label" class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Accès rapide démonstration (1 clic)</p>
+        <div class="grid grid-cols-2 gap-2.5">
+          <button type="button" onclick="quickLogin('admin')" class="p-3 rounded-2xl border border-slate-200 hover:border-[#0F4C81] hover:bg-blue-50/60 text-left transition group shadow-2xs">
+            <span class="block text-xs font-bold text-slate-800 group-hover:text-[#0F4C81]">Administrateur</span>
+            <span class="block text-[11px] font-mono text-slate-500 mt-0.5">admin / admin123</span>
+          </button>
+          <button type="button" onclick="quickLogin('doctor')" class="p-3 rounded-2xl border border-slate-200 hover:border-teal-600 hover:bg-teal-50/60 text-left transition group shadow-2xs">
+            <span class="block text-xs font-bold text-slate-800 group-hover:text-teal-700">Médecin</span>
+            <span class="block text-[11px] font-mono text-slate-500 mt-0.5">dr.diallo / med123</span>
+          </button>
+          <button type="button" onclick="quickLogin('secretary')" class="p-3 rounded-2xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50/60 text-left transition group shadow-2xs">
+            <span class="block text-xs font-bold text-slate-800 group-hover:text-amber-700">Secrétaire</span>
+            <span class="block text-[11px] font-mono text-slate-500 mt-0.5">sec.ndiaye / sec123</span>
+          </button>
+          <button type="button" onclick="quickLogin('nurse')" class="p-3 rounded-2xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/60 text-left transition group shadow-2xs">
+            <span class="block text-xs font-bold text-slate-800 group-hover:text-indigo-700">Infirmier(ère)</span>
+            <span class="block text-[11px] font-mono text-slate-500 mt-0.5">inf.gomes / inf123</span>
+          </button>
+        </div>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-3.5 pt-3 border-t border-slate-100">
+        <div id="login-error-box" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold"></div>
+        <div>
+          <label id="login-user-label" class="block text-xs font-bold text-slate-700 mb-1">Identifiant de connexion</label>
+          <input type="text" id="login-username-input" value="admin" required placeholder="admin, dr.diallo, sec.ndiaye, inf.gomes" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none" />
+        </div>
+        <div>
+          <label id="login-pass-label" class="block text-xs font-bold text-slate-700 mb-1">Mot de passe sécurisé</label>
+          <input type="password" id="login-password-input" value="admin123" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none" />
+        </div>
+        <button type="submit" id="login-submit-btn" class="w-full py-3 rounded-xl bg-gradient-to-r from-[#0F4C81] via-teal-600 to-emerald-600 hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-teal-700/20 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-right-to-bracket"></i> <span>Ouvrir la session</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Conteneur Principal -->
+  <div id="app" class="min-h-screen flex flex-col lg:flex-row">
+
+    <!-- Overlay Mobile -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden backdrop-blur-xs"></div>
+
+    <!-- Barre Latérale (Sidebar) -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 bg-gradient-to-b from-slate-950 via-slate-900 to-[#091e36] text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl border-r border-slate-800/80">
+      <!-- Logo -->
+      <div class="p-5 border-b border-slate-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-teal-500/25">
+            <i class="fa-solid fa-heart-pulse text-xl"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-base tracking-tight leading-tight">Clinique <span class="text-teal-400">SantéPlus</span></h1>
+            <p class="text-[11px] text-slate-400">MediCore Pro • FR / EN / PT</p>
+          </div>
+        </div>
+        <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-2 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Carte Utilisateur -->
+      <div class="px-4 py-3.5 mx-3 mt-4 rounded-2xl bg-slate-800/70 border border-slate-700/60 shadow-inner">
+        <div class="flex items-center gap-3">
+          <div id="user-avatar" class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0F4C81] to-teal-600 flex items-center justify-center font-bold text-sm text-white shrink-0 shadow-sm">AD</div>
+          <div class="min-w-0 flex-1">
+            <p id="user-name" class="text-sm font-semibold truncate">Dr. Aminata Diallo</p>
+            <span id="user-role-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-teal-500/20 text-teal-300 border border-teal-500/30">
+              Administrateur
+            </span>
+          </div>
+          <button onclick="logoutUser()" data-i18n-title="logout" title="Déconnexion" class="p-2 rounded-lg text-rose-300 hover:text-white hover:bg-rose-600/80 transition">
+            <i class="fa-solid fa-power-off text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Menu Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+        <button onclick="navigateTo('dashboard')" data-nav="dashboard" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+          <i class="fa-solid fa-chart-line w-5 text-center"></i>
+          <span data-i18n="nav_dashboard">Tableau de bord</span>
+        </button>
+
+        <button onclick="navigateTo('patients')" data-nav="patients" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+          <i class="fa-solid fa-hospital-user w-5 text-center"></i>
+          <span data-i18n="nav_patients">Patients & Dossiers</span>
+          <span id="nav-patient-count" class="ml-auto bg-slate-800 text-slate-300 text-xs py-0.5 px-2 rounded-full">0</span>
+        </button>
+
+        <button onclick="navigateTo('consultations')" data-nav="consultations" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+          <i class="fa-solid fa-stethoscope w-5 text-center"></i>
+          <span data-i18n="nav_consultations">Consultations & RDV</span>
+        </button>
+
+        <button onclick="navigateTo('staff')" data-nav="staff" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+          <i class="fa-solid fa-user-doctor w-5 text-center"></i>
+          <span data-i18n="nav_staff">Médecins & Personnel</span>
+        </button>
+
+        <button onclick="navigateTo('stats')" data-nav="stats" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+          <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+          <span data-i18n="nav_stats">Statistiques & Rapports</span>
+        </button>
+
+        <button onclick="navigateTo('security')" data-nav="security" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+          <i class="fa-solid fa-shield-halved w-5 text-center"></i>
+          <span data-i18n="nav_security">Sécurité & Journal</span>
+        </button>
+      </nav>
+
+      <!-- Pied de Sidebar : Sauvegarde auto & Reset -->
+      <div class="p-4 border-t border-slate-800 space-y-2.5">
+        <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span data-i18n="auto_backup">Sauvegarde auto</span>
+          </span>
+          <span class="font-mono text-[11px]">LocalStorage</span>
+        </div>
+        <button onclick="openResetModal()" class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-rotate-left"></i>
+          <span data-i18n="reset_demo">Réinitialiser données démo</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Zone Principale -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- Barre Supérieure (Topbar) -->
+      <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-20 px-4 sm:px-6 py-3 shadow-2xs">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+
+          <!-- Menu Mobile + Recherche Globale -->
+          <div class="flex items-center gap-2.5 flex-1 min-w-[220px] max-w-xl">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div class="relative flex-1">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+              <input
+                type="text"
+                id="global-search-input"
+                oninput="handleGlobalSearch(this.value)"
+                placeholder="Rechercher un patient (Nom, Prénom ou ID)..."
+                class="w-full pl-10 pr-4 py-2 bg-slate-100/80 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition"
+              />
+              <div id="global-search-results" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50 max-h-80 overflow-y-auto"></div>
+            </div>
+          </div>
+
+          <!-- Contrôles Droite : Sélecteur de Langue (FR / EN / PT) + Sélecteur de Rôle -->
+          <div class="flex items-center gap-2.5 flex-wrap">
+
+            <!-- Sélecteur de Langue FR / EN / PT -->
+            <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200" title="Langue / Language / Idioma">
+              <i class="fa-solid fa-globe text-teal-600 text-xs mx-2 hidden sm:inline"></i>
+              <button onclick="setLanguage('fr')" data-lang-btn="fr" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">FR</button>
+              <button onclick="setLanguage('en')" data-lang-btn="en" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">EN</button>
+              <button onclick="setLanguage('pt')" data-lang-btn="pt" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">PT</button>
+            </div>
+
+            <!-- Sélecteur de Rôle RBAC & Déconnexion -->
+            <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <span class="text-xs font-semibold text-slate-500 pl-2 hidden xl:inline">
+                <i class="fa-solid fa-user-lock mr-1 text-[#0F4C81]"></i>
+                <span data-i18n="active_role">Profil :</span>
+              </span>
+              <select id="role-switcher" onchange="switchUserRole(this.value)" class="bg-white text-slate-800 text-xs font-semibold py-1.5 px-2.5 rounded-lg border border-slate-200 shadow-2xs focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
+                <option value="admin">Administrateur</option>
+                <option value="doctor">Médecin</option>
+                <option value="secretary">Secrétaire</option>
+                <option value="nurse">Infirmier / Personnel</option>
+              </select>
+              <button onclick="logoutUser()" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold flex items-center gap-1.5 transition" title="Déconnexion">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="hidden md:inline" data-i18n="logout">Déconnexion</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </header>
+
+      <!-- Bannière de Restriction Rôle Secrétaire -->
+      <div id="role-banner" class="hidden bg-amber-50 border-b border-amber-200 px-6 py-2.5 text-amber-900 text-xs sm:text-sm flex items-center gap-2.5">
+        <i class="fa-solid fa-lock text-amber-600 shrink-0"></i>
+        <span id="role-banner-text"></span>
+      </div>
+
+      <!-- Contenu Dynamique Principal -->
+      <main id="main-content" class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6"></main>
+
+    </div>
+  </div>
+
+  <!-- Conteneur Toasts -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- Modale Universelle -->
+  <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="modal-container" class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+        <h3 id="modal-title" class="text-base sm:text-lg font-bold text-slate-800">Titre</h3>
+        <button onclick="closeModal()" class="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="modal-body" class="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6"></div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * DICTIONNAIRE MULTILINGUE COMPLET : FRANÇAIS (FR) / ANGLAIS (EN) / PORTUGAIS (PT)
+     * ============================================================================
+     */
+    const TRANSLATIONS = {
+      fr: {
+        nav_dashboard: "Tableau de bord",
+        nav_patients: "Patients & Dossiers",
+        nav_consultations: "Consultations & RDV",
+        nav_staff: "Médecins & Personnel",
+        nav_stats: "Statistiques & Rapports",
+        nav_security: "Sécurité & Journal",
+        auto_backup: "Sauvegarde auto",
+        reset_demo: "Réinitialiser données démo",
+        search_placeholder: "Rechercher un patient (Nom, Prénom, ID ou NIN)...",
+        no_search_result: "Aucun patient trouvé pour",
+        active_role: "Profil :",
+        years_old: "ans",
+        cancel: "Annuler",
+        save: "Enregistrer",
+        close: "Fermer",
+        edit: "Modifier",
+        print: "Imprimer",
+        delete: "Supprimer",
+        actions: "Actions",
+        all: "Tous",
+
+        role_admin: "Administrateur",
+        role_doctor: "Médecin",
+        role_secretary: "Secrétaire",
+        role_nurse: "Personnel Infirmier",
+        role_admin_desc: "Administrateur (Accès Total)",
+        role_doctor_desc: "Médecin (Dossiers & Soins)",
+        role_secretary_desc: "Secrétaire (Accueil & RDV)",
+        role_nurse_desc: "Personnel Infirmier (Suivi Soins)",
+        secretary_banner: "Mode Secrétariat / Réception : Vous pouvez enregistrer les patients et gérer les rendez-vous. Les informations médicales confidentielles (diagnostics, antécédents, prescriptions) sont verrouillées.",
+        confidential_locked: "Confidentiel (Accès Médecin)",
+        restricted_title: "Accès Médical Confidentiel Restreint",
+        restricted_desc: "Votre profil Secrétaire ne permet pas de consulter ou modifier les données médicales confidentielles. Seul un médecin ou administrateur est habilité.",
+
+        login_title: "Connexion au portail médical",
+        login_subtitle: "Saisissez vos identifiants ou cliquez sur un profil de démonstration ci-dessous.",
+        login_quick_label: "Accès rapide démonstration (1 clic)",
+        login_user_label: "Identifiant de connexion",
+        login_pass_label: "Mot de passe sécurisé",
+        login_submit_btn: "Ouvrir la session",
+        login_invalid: "Identifiant ou mot de passe incorrect.",
+        logout: "Déconnexion",
+
+        status_treatment: "En traitement",
+        status_hospitalized: "Hospitalisé",
+        status_recovered: "Guéri",
+        status_discharged: "Sorti",
+        status_transferred: "Transféré",
+        filter_former_patients: "Anciens patients / Sortis",
+
+        dash_title: "Tableau de bord de la clinique",
+        dash_subtitle: "Vue d'ensemble en temps réel des statistiques médicales et du suivi des patients.",
+        btn_new_patient: "Nouveau Patient",
+        btn_new_consultation: "Nouvelle Consultation",
+        kpi_total_patients: "Total Patients Enregistrés",
+        kpi_total_sub: "Base de données centralisée",
+        kpi_new_patients: "Nouveaux Patients (Ce mois)",
+        kpi_new_sub: "Admissions récentes",
+        kpi_hospitalized: "Actuellement Hospitalisés",
+        kpi_hospitalized_sub: "Surveillance hospitalière",
+        kpi_recovered: "Patients Guéris / Sortis",
+        kpi_recovered_sub: "Prise en charge réussie",
+        kpi_consultations: "Consultations Effectuées",
+        kpi_consultations_sub: "Actes médicaux enregistrés",
+        kpi_in_treatment: "En Cours de Traitement",
+        kpi_in_treatment_sub: "Suivi ambulatoire actif",
+        chart_monthly_title: "Évolution mensuelle : Consultations & Admissions",
+        chart_monthly_sub: "Courbe comparative sur les derniers mois",
+        chart_status_title: "Répartition par statut clinique",
+        chart_status_sub: "État actuel des dossiers",
+        upcoming_appointments: "Rendez-vous du jour & Alertes cliniques",
+        no_appointments: "Aucun rendez-vous programmé.",
+        recent_patients: "Dossiers patients récents",
+        view_all: "Voir tout",
+        manage_patients: "Gérer les patients",
+
+        patients_title: "Patients & Dossiers Médicaux",
+        patients_subtitle: "Gestion centralisée, recherche rapide et suivi clinique individuel.",
+        register_patient_btn: "Enregistrer un patient",
+        filter_placeholder: "Filtrer par nom, ID, NIN, téléphone...",
+        col_id: "ID Unique",
+        col_patient: "Patient",
+        col_age_sex: "Âge / Sexe",
+        col_contact: "Contact",
+        col_pathology: "Pathologie / Motif",
+        col_status: "Statut",
+        no_patient_match: "Aucun dossier patient ne correspond à votre recherche.",
+        tab_personal: "1. Informations Personnelles",
+        tab_medical: "2. Informations Médicales & Suivi",
+        modal_new_patient: "Enregistrement d'un nouveau patient",
+        modal_edit_patient: "Modifier le dossier patient",
+        create_patient_btn: "Créer le dossier patient",
+        save_changes_btn: "Enregistrer les modifications",
+
+        f_unique_id: "N° d'identification unique",
+        f_nin: "N° unique d'identité nationale (NIN)",
+        f_blood_group: "Groupe sanguin & Rhésus",
+        f_insurance: "Assurance / Mutuelle santé",
+        f_vitals_bp: "Tension artérielle (TA)",
+        f_vitals_temp: "Température (°C)",
+        f_vitals_weight: "Poids (kg)",
+        f_room_bed: "Service / Chambre & Lit",
+        btn_print_prescription: "Imprimer Ordonnance",
+        btn_print_card: "Carte Santé Patient",
+        f_lastname: "Nom",
+        f_firstname: "Prénom",
+        f_gender: "Sexe",
+        gender_f: "Féminin",
+        gender_m: "Masculin",
+        f_birthdate: "Date de naissance",
+        f_age_auto: "Âge (calculé automatiquement)",
+        f_address: "Adresse et lieu de résidence",
+        f_phone: "Numéro de téléphone",
+        f_email: "Adresse e-mail (facultative)",
+        f_profession: "Profession (facultative)",
+        f_emergency: "Personne à contacter en cas d'urgence",
+        f_admission_date: "Date d'admission",
+        f_care_status: "Statut de prise en charge",
+        f_reason: "Motif de consultation",
+        f_disease: "Type de maladie ou pathologie diagnostiquée",
+        f_symptoms: "Symptômes observés",
+        f_history: "Antécédents médicaux",
+        f_allergies: "Allergies connues",
+        f_exams: "Examens médicaux effectués",
+        f_diagnosis: "Diagnostic du médecin",
+        f_treatment: "Traitement prescrit",
+        f_medications: "Médicaments administrés",
+        f_treatment_start: "Date de début du traitement",
+        f_followup_date: "Date des consultations de suivi",
+        f_discharge_date: "Date de guérison ou de sortie",
+        f_evolution: "Évolution de l'état de santé",
+        f_observations: "Observations et recommandations du médecin",
+
+        dossier_title: "Dossier Individuel",
+        admitted_on: "Admis le",
+        add_consultation_btn: "Ajouter Consultation",
+        print_sheet_btn: "Imprimer Fiche",
+        section_personal_info: "Informations Personnelles & Administratives",
+        section_medical_info: "Dossier Clinique & Suivi Thérapeutique",
+        section_history_consult: "Historique des Consultations",
+        no_consult_history: "Aucune consultation enregistrée pour ce patient.",
+
+        consult_title: "Gestion des Consultations & Rendez-vous",
+        consult_subtitle: "Enregistrement des actes médicaux, diagnostics, prescriptions et suivi des RDV.",
+        filter_consult_all: "Toutes",
+        filter_consult_today: "Aujourd'hui",
+        filter_consult_upcoming: "RDV à venir",
+        filter_consult_completed: "Terminées",
+        col_datetime: "Date & Heure",
+        col_doctor: "Médecin Responsable",
+        col_reason_diag: "Motif & Diagnostic",
+        col_prescriptions: "Prescriptions",
+        col_next_rdv: "Prochain RDV",
+        modal_new_consult: "Enregistrer une nouvelle consultation",
+        select_patient: "Sélectionner le patient",
+
+        staff_title: "Médecins & Personnel de la Clinique",
+        staff_subtitle: "Répertoire du corps médical, spécialités, fonctions et identifiants d'accès.",
+        add_staff_btn: "Ajouter un membre",
+        edit_staff_btn: "Modifier le membre",
+        col_specialty: "Spécialité",
+        col_role_title: "Fonction dans la clinique",
+        col_login_id: "Identifiant connexion",
+        col_access_level: "Niveau d'accès",
+        staff_status_label: "Statut de service",
+        staff_active: "Actif",
+        staff_oncall: "En garde",
+
+        stats_title: "Statistiques Médicales & Rapports",
+        stats_subtitle: "Analyse épidémiologique, démographique et exportation des données.",
+        export_excel_btn: "Exporter en Excel (.csv)",
+        export_pdf_btn: "Générer Rapport PDF",
+        chart_diseases: "Maladies les plus fréquentes (Courbe & Aire)",
+        chart_ages: "Pyramide des âges (Hommes / Femmes)",
+        chart_gender: "Pyramide clinique & Répartition par sexe",
+        chart_outcomes: "Courbe mensuelle : Guérisons, Hospitalisations & Consultations",
+
+        security_title: "Sécurité, Sauvegardes & Traçabilité",
+        security_subtitle: "Contrôle d'accès par rôle (RBAC), sauvegarde/restauration JSON et journal d'audit complet.",
+        backup_download_btn: "Exporter sauvegarde JSON",
+        backup_restore_btn: "Importer sauvegarde JSON",
+        audit_log_title: "Journal d'audit des opérations (Traçabilité)",
+        col_timestamp: "Horodatage",
+        col_user: "Utilisateur",
+        col_action: "Action",
+        col_details: "Détails",
+
+        toast_lang_changed: "Langue modifiée : Français",
+        toast_role_changed: "Profil actif :",
+        toast_patient_created: "Dossier patient créé avec succès",
+        toast_patient_updated: "Dossier patient mis à jour",
+        toast_consult_saved: "Consultation enregistrée et RDV de suivi planifié",
+        toast_staff_added: "Membre du personnel enregistré",
+        toast_csv_exported: "Rapport exporté au format Excel (.csv)",
+        toast_backup_exported: "Sauvegarde JSON téléchargée",
+        toast_backup_restored: "Base de données restaurée depuis le fichier JSON",
+        reset_confirm_title: "Réinitialiser les données de démonstration ?",
+        reset_confirm_desc: "Cette action restaurera les dossiers patients, consultations et membres du personnel initiaux.",
+        reset_confirm_btn: "Oui, réinitialiser"
+      },
+
+      en: {
+        nav_dashboard: "Dashboard",
+        nav_patients: "Patients & Records",
+        nav_consultations: "Consultations & Appts",
+        nav_staff: "Doctors & Staff",
+        nav_stats: "Statistics & Reports",
+        nav_security: "Security & Audit Log",
+        auto_backup: "Auto backup",
+        reset_demo: "Reset demo data",
+        search_placeholder: "Search patient (Name, ID or National ID)...",
+        no_search_result: "No patient found for",
+        active_role: "Role:",
+        years_old: "yrs",
+        cancel: "Cancel",
+        save: "Save",
+        close: "Close",
+        edit: "Edit",
+        print: "Print",
+        delete: "Delete",
+        actions: "Actions",
+        all: "All",
+
+        role_admin: "Administrator",
+        role_doctor: "Doctor",
+        role_secretary: "Secretary",
+        role_nurse: "Nursing Staff",
+        role_admin_desc: "Administrator (Full Access)",
+        role_doctor_desc: "Doctor (Records & Care)",
+        role_secretary_desc: "Secretary (Reception & Appts)",
+        role_nurse_desc: "Nursing Staff (Care Follow-up)",
+        secretary_banner: "Reception / Secretary Mode: You can register patients and manage appointments. Confidential medical records (diagnoses, medical history, prescriptions) are locked.",
+        confidential_locked: "Confidential (Doctor Access)",
+        restricted_title: "Confidential Medical Access Restricted",
+        restricted_desc: "Your Secretary profile does not allow viewing or editing confidential medical data. Only an authorized doctor or administrator has access.",
+
+        login_title: "Medical Portal Login",
+        login_subtitle: "Enter your credentials or click a demo profile below.",
+        login_quick_label: "Quick Demo Login (1-click)",
+        login_user_label: "Login Username",
+        login_pass_label: "Secure Password",
+        login_submit_btn: "Start Session",
+        login_invalid: "Invalid username or password.",
+        logout: "Logout",
+
+        status_treatment: "In treatment",
+        status_hospitalized: "Hospitalized",
+        status_recovered: "Recovered",
+        status_discharged: "Discharged",
+        status_transferred: "Transferred",
+        filter_former_patients: "Former Patients / Discharged",
+
+        dash_title: "Clinic Dashboard",
+        dash_subtitle: "Real-time overview of clinical statistics and patient care management.",
+        btn_new_patient: "New Patient",
+        btn_new_consultation: "New Consultation",
+        kpi_total_patients: "Total Registered Patients",
+        kpi_total_sub: "Centralized database",
+        kpi_new_patients: "New Patients (This Month)",
+        kpi_new_sub: "Recent admissions",
+        kpi_hospitalized: "Currently Hospitalized",
+        kpi_hospitalized_sub: "Inpatient monitoring",
+        kpi_recovered: "Recovered / Discharged",
+        kpi_recovered_sub: "Successful recovery",
+        kpi_consultations: "Consultations Performed",
+        kpi_consultations_sub: "Recorded medical visits",
+        kpi_in_treatment: "Under Treatment",
+        kpi_in_treatment_sub: "Active outpatient care",
+        chart_monthly_title: "Monthly Trend: Consultations & Admissions",
+        chart_monthly_sub: "Comparative curve over recent months",
+        chart_status_title: "Clinical Status Distribution",
+        chart_status_sub: "Current status breakdown",
+        upcoming_appointments: "Today's Appointments & Clinical Alerts",
+        no_appointments: "No scheduled appointments.",
+        recent_patients: "Recent Patient Records",
+        view_all: "View all",
+        manage_patients: "Manage patients",
+
+        patients_title: "Patients & Medical Records",
+        patients_subtitle: "Centralized management, fast search, and individual clinical tracking.",
+        register_patient_btn: "Register Patient",
+        filter_placeholder: "Filter by name, ID, NIN, phone...",
+        col_id: "Unique ID",
+        col_patient: "Patient",
+        col_age_sex: "Age / Sex",
+        col_contact: "Contact",
+        col_pathology: "Condition / Reason",
+        col_status: "Status",
+        no_patient_match: "No patient record matches your search.",
+        tab_personal: "1. Personal Information",
+        tab_medical: "2. Medical Info & Follow-up",
+        modal_new_patient: "Register a New Patient",
+        modal_edit_patient: "Edit Patient Record",
+        create_patient_btn: "Create Patient Record",
+        save_changes_btn: "Save Changes",
+
+        f_unique_id: "Unique Patient ID",
+        f_nin: "Unique National ID Number (NIN)",
+        f_blood_group: "Blood Type & Rh",
+        f_insurance: "Health Insurance / Coverage",
+        f_vitals_bp: "Blood Pressure (BP)",
+        f_vitals_temp: "Temperature (°C)",
+        f_vitals_weight: "Weight (kg)",
+        f_room_bed: "Ward / Room & Bed",
+        btn_print_prescription: "Print Prescription",
+        btn_print_card: "Patient Health Card",
+        f_lastname: "Last Name",
+        f_firstname: "First Name",
+        f_gender: "Sex / Gender",
+        gender_f: "Female",
+        gender_m: "Male",
+        f_birthdate: "Date of Birth",
+        f_age_auto: "Age (auto-calculated)",
+        f_address: "Address & Place of Residence",
+        f_phone: "Phone Number",
+        f_email: "Email Address (optional)",
+        f_profession: "Profession (optional)",
+        f_emergency: "Emergency Contact Person",
+        f_admission_date: "Admission Date",
+        f_care_status: "Care Status",
+        f_reason: "Reason for Consultation",
+        f_disease: "Diagnosed Disease or Pathology",
+        f_symptoms: "Observed Symptoms",
+        f_history: "Medical History",
+        f_allergies: "Known Allergies",
+        f_exams: "Medical Examinations Performed",
+        f_diagnosis: "Doctor's Diagnosis",
+        f_treatment: "Prescribed Treatment",
+        f_medications: "Administered Medications",
+        f_treatment_start: "Treatment Start Date",
+        f_followup_date: "Follow-up Consultation Date",
+        f_discharge_date: "Recovery or Discharge Date",
+        f_evolution: "Health Status Evolution",
+        f_observations: "Doctor's Observations & Recommendations",
+
+        dossier_title: "Individual Medical Record",
+        admitted_on: "Admitted on",
+        add_consultation_btn: "Add Consultation",
+        print_sheet_btn: "Print Sheet",
+        section_personal_info: "Personal & Administrative Information",
+        section_medical_info: "Clinical Record & Therapeutic Follow-up",
+        section_history_consult: "Consultation History",
+        no_consult_history: "No consultations recorded for this patient.",
+
+        consult_title: "Consultations & Appointments Management",
+        consult_subtitle: "Record medical visits, diagnoses, prescriptions, and next appointments.",
+        filter_consult_all: "All",
+        filter_consult_today: "Today",
+        filter_consult_upcoming: "Upcoming Appts",
+        filter_consult_completed: "Completed",
+        col_datetime: "Date & Time",
+        col_doctor: "Attending Doctor",
+        col_reason_diag: "Reason & Diagnosis",
+        col_prescriptions: "Prescriptions",
+        col_next_rdv: "Next Appointment",
+        modal_new_consult: "Record New Consultation",
+        select_patient: "Select Patient",
+
+        staff_title: "Doctors & Clinic Staff",
+        staff_subtitle: "Directory of medical practitioners, specialties, roles, and login IDs.",
+        add_staff_btn: "Add Staff Member",
+        edit_staff_btn: "Edit Staff Member",
+        col_specialty: "Specialty",
+        col_role_title: "Clinic Function",
+        col_login_id: "Login ID",
+        col_access_level: "Access Level",
+        staff_status_label: "Duty Status",
+        staff_active: "Active",
+        staff_oncall: "On Call",
+
+        stats_title: "Medical Statistics & Reports",
+        stats_subtitle: "Epidemiological and demographic analytics with Excel/PDF export.",
+        export_excel_btn: "Export Excel (.csv)",
+        export_pdf_btn: "Generate PDF Report",
+        chart_diseases: "Most Frequent Diseases (Smooth Curve)",
+        chart_ages: "Population Age Pyramid (Male / Female)",
+        chart_gender: "Clinical Care Pyramid & Sex Distribution",
+        chart_outcomes: "Monthly Curve: Recoveries, Hospitalizations & Consultations",
+
+        security_title: "Security, Backups & Audit Trail",
+        security_subtitle: "Role-based access control (RBAC), JSON backup/restore, and full audit log.",
+        backup_download_btn: "Export JSON Backup",
+        backup_restore_btn: "Import JSON Backup",
+        audit_log_title: "System Activity Audit Log (Traceability)",
+        col_timestamp: "Timestamp",
+        col_user: "User",
+        col_action: "Action",
+        col_details: "Details",
+
+        toast_lang_changed: "Language changed: English",
+        toast_role_changed: "Active role:",
+        toast_patient_created: "Patient record successfully created",
+        toast_patient_updated: "Patient record updated",
+        toast_consult_saved: "Consultation saved and follow-up scheduled",
+        toast_staff_added: "Staff member saved",
+        toast_csv_exported: "Report exported to Excel (.csv)",
+        toast_backup_exported: "JSON backup downloaded",
+        toast_backup_restored: "Database restored from JSON file",
+        reset_confirm_title: "Reset demo data?",
+        reset_confirm_desc: "This will restore the initial demo patients, consultations, and staff members.",
+        reset_confirm_btn: "Yes, reset"
+      },
+
+      pt: {
+        nav_dashboard: "Painel de Controlo",
+        nav_patients: "Pacientes e Prontuários",
+        nav_consultations: "Consultas e Marcações",
+        nav_staff: "Médicos e Equipa",
+        nav_stats: "Estatísticas e Relatórios",
+        nav_security: "Segurança e Registos",
+        auto_backup: "Cópia automática",
+        reset_demo: "Repor dados de demo",
+        search_placeholder: "Pesquisar paciente (Nome, ID ou NIN)...",
+        no_search_result: "Nenhum paciente encontrado para",
+        active_role: "Perfil:",
+        years_old: "anos",
+        cancel: "Cancelar",
+        save: "Guardar",
+        close: "Fechar",
+        edit: "Editar",
+        print: "Imprimir",
+        delete: "Eliminar",
+        actions: "Ações",
+        all: "Todos",
+
+        role_admin: "Administrador",
+        role_doctor: "Médico",
+        role_secretary: "Secretária",
+        role_nurse: "Equipa de Enfermagem",
+        role_admin_desc: "Administrador (Acesso Total)",
+        role_doctor_desc: "Médico (Prontuários e Cuidados)",
+        role_secretary_desc: "Secretária (Receção e Marcações)",
+        role_nurse_desc: "Enfermagem (Acompanhamento)",
+        secretary_banner: "Modo Secretariado / Receção: Pode registar pacientes e gerir marcações. As informações médicas confidenciais (diagnósticos, antecedentes, prescrições) estão bloqueadas.",
+        confidential_locked: "Confidencial (Acesso Médico)",
+        restricted_title: "Acesso Médico Confidencial Restrito",
+        restricted_desc: "O seu perfil de Secretária não permite visualizar ou editar dados médicos confidenciais. Apenas um médico ou administrador autorizado tem acesso.",
+
+        login_title: "Acesso ao Portal Médico",
+        login_subtitle: "Introduza as suas credenciais ou clique num perfil de demonstração abaixo.",
+        login_quick_label: "Acesso rápido de demonstração (1 clique)",
+        login_user_label: "Identificador de Acesso",
+        login_pass_label: "Palavra-passe Segura",
+        login_submit_btn: "Iniciar Sessão",
+        login_invalid: "Identificador ou palavra-passe incorretos.",
+        logout: "Terminar Sessão",
+
+        status_treatment: "Em tratamento",
+        status_hospitalized: "Internado",
+        status_recovered: "Curado",
+        status_discharged: "Alta médica",
+        status_transferred: "Transferido",
+        filter_former_patients: "Antigos Pacientes / Alta",
+
+        dash_title: "Painel de Controlo da Clínica",
+        dash_subtitle: "Visão geral em tempo real das estatísticas médicas e acompanhamento de pacientes.",
+        btn_new_patient: "Novo Paciente",
+        btn_new_consultation: "Nova Consulta",
+        kpi_total_patients: "Total de Pacientes Registados",
+        kpi_total_sub: "Base de dados centralizada",
+        kpi_new_patients: "Novos Pacientes (Este mês)",
+        kpi_new_sub: "Admissões recentes",
+        kpi_hospitalized: "Atualmente Internados",
+        kpi_hospitalized_sub: "Vigilância hospitalar",
+        kpi_recovered: "Pacientes Curados / Alta",
+        kpi_recovered_sub: "Tratamento concluído",
+        kpi_consultations: "Consultas Realizadas",
+        kpi_consultations_sub: "Atos médicos registados",
+        kpi_in_treatment: "Em Curso de Tratamento",
+        kpi_in_treatment_sub: "Acompanhamento ativo",
+        chart_monthly_title: "Evolução Mensal: Consultas e Admissões",
+        chart_monthly_sub: "Curva comparativa dos últimos meses",
+        chart_status_title: "Distribuição por Estado Clínico",
+        chart_status_sub: "Estado atual dos prontuários",
+        upcoming_appointments: "Consultas do Dia e Alertas Clínicos",
+        no_appointments: "Nenhuma consulta agendada.",
+        recent_patients: "Prontuários de Pacientes Recentes",
+        view_all: "Ver tudo",
+        manage_patients: "Gerir pacientes",
+
+        patients_title: "Pacientes e Prontuários Médicos",
+        patients_subtitle: "Gestão centralizada, pesquisa rápida e acompanhamento clínico individual.",
+        register_patient_btn: "Registar Paciente",
+        filter_placeholder: "Filtrar por nome, ID, NIN, telefone...",
+        col_id: "ID Único",
+        col_patient: "Paciente",
+        col_age_sex: "Idade / Sexo",
+        col_contact: "Contacto",
+        col_pathology: "Patologia / Motivo",
+        col_status: "Estado",
+        no_patient_match: "Nenhum prontuário corresponde à sua pesquisa.",
+        tab_personal: "1. Informações Pessoais",
+        tab_medical: "2. Informações Médicas e Seguimento",
+        modal_new_patient: "Registo de Novo Paciente",
+        modal_edit_patient: "Editar Prontuário do Paciente",
+        create_patient_btn: "Criar Prontuário",
+        save_changes_btn: "Guardar Alterações",
+
+        f_unique_id: "N.º de Identificação Único",
+        f_nin: "N.º Único de Identidade Nacional (NIN)",
+        f_blood_group: "Grupo Sanguíneo e Fator Rh",
+        f_insurance: "Seguro de Saúde / Convénio",
+        f_vitals_bp: "Tensão Arterial (TA)",
+        f_vitals_temp: "Temperatura (°C)",
+        f_vitals_weight: "Peso (kg)",
+        f_room_bed: "Enfermaria / Quarto e Cama",
+        btn_print_prescription: "Imprimir Receita",
+        btn_print_card: "Cartão de Saúde",
+        f_lastname: "Apelido",
+        f_firstname: "Nome Próprio",
+        f_gender: "Sexo",
+        gender_f: "Feminino",
+        gender_m: "Masculino",
+        f_birthdate: "Data de Nascimento",
+        f_age_auto: "Idade (calculada automaticamente)",
+        f_address: "Morada e Local de Residência",
+        f_phone: "Número de Telefone",
+        f_email: "Endereço de E-mail (opcional)",
+        f_profession: "Profissão (opcional)",
+        f_emergency: "Contacto de Emergência",
+        f_admission_date: "Data de Admissão",
+        f_care_status: "Estado Clínico",
+        f_reason: "Motivo da Consulta",
+        f_disease: "Doença ou Patologia Diagnosticada",
+        f_symptoms: "Sintomas Observados",
+        f_history: "Antecedentes Médicos",
+        f_allergies: "Alergias Conhecidas",
+        f_exams: "Exames Médicos Realizados",
+        f_diagnosis: "Diagnóstico do Médico",
+        f_treatment: "Tratamento Prescrito",
+        f_medications: "Medicamentos Administrados",
+        f_treatment_start: "Data de Início do Tratamento",
+        f_followup_date: "Data das Consultas de Seguimento",
+        f_discharge_date: "Data de Cura ou Alta",
+        f_evolution: "Evolução do Estado de Saúde",
+        f_observations: "Observações e Recomendações do Médico",
+
+        dossier_title: "Prontuário Individual",
+        admitted_on: "Admitido em",
+        add_consultation_btn: "Adicionar Consulta",
+        print_sheet_btn: "Imprimir Ficha",
+        section_personal_info: "Informações Pessoais e Administrativas",
+        section_medical_info: "Registo Clínico e Seguimento Terapêutico",
+        section_history_consult: "Histórico de Consultas",
+        no_consult_history: "Nenhuma consulta registada para este paciente.",
+
+        consult_title: "Gestão de Consultas e Marcações",
+        consult_subtitle: "Registo de atos médicos, diagnósticos, prescrições e próximas consultas.",
+        filter_consult_all: "Todas",
+        filter_consult_today: "Hoje",
+        filter_consult_upcoming: "Próximas",
+        filter_consult_completed: "Concluídas",
+        col_datetime: "Data e Hora",
+        col_doctor: "Médico Responsável",
+        col_reason_diag: "Motivo e Diagnóstico",
+        col_prescriptions: "Prescrições",
+        col_next_rdv: "Próxima Consulta",
+        modal_new_consult: "Registar Nova Consulta",
+        select_patient: "Selecionar Paciente",
+
+        staff_title: "Médicos e Equipa da Clínica",
+        staff_subtitle: "Diretório do corpo clínico, especialidades, funções e credenciais de acesso.",
+        add_staff_btn: "Adicionar Membro",
+        edit_staff_btn: "Editar Membro",
+        col_specialty: "Especialidade",
+        col_role_title: "Função na Clínica",
+        col_login_id: "ID de Acesso",
+        col_access_level: "Nível de Acesso",
+        staff_status_label: "Estado de Serviço",
+        staff_active: "Ativo",
+        staff_oncall: "Em serviço",
+
+        stats_title: "Estatísticas Médicas e Relatórios",
+        stats_subtitle: "Análise epidemiológica e demográfica com exportação para Excel/PDF.",
+        export_excel_btn: "Exportar em Excel (.csv)",
+        export_pdf_btn: "Gerar Relatório PDF",
+        chart_diseases: "Doenças Mais Frequentes (Curva Suave)",
+        chart_ages: "Pirâmide Etária (Homens / Mulheres)",
+        chart_gender: "Pirâmide Clínica e Distribuição por Sexo",
+        chart_outcomes: "Curva Mensal: Curas, Internamentos e Consultas",
+
+        security_title: "Segurança, Cópias e Rastreabilidade",
+        security_subtitle: "Controlo de acesso por perfil (RBAC), cópia/restauro JSON e auditoria completa.",
+        backup_download_btn: "Exportar Cópia JSON",
+        backup_restore_btn: "Importar Cópia JSON",
+        audit_log_title: "Registo de Auditoria de Operações (Rastreabilidade)",
+        col_timestamp: "Data/Hora",
+        col_user: "Utilizador",
+        col_action: "Ação",
+        col_details: "Detalhes",
+
+        toast_lang_changed: "Idioma alterado: Português",
+        toast_role_changed: "Perfil ativo:",
+        toast_patient_created: "Prontuário do paciente criado com sucesso",
+        toast_patient_updated: "Prontuário do paciente atualizado",
+        toast_consult_saved: "Consulta registada e seguimento agendado",
+        toast_staff_added: "Membro da equipa guardado",
+        toast_csv_exported: "Relatório exportado para Excel (.csv)",
+        toast_backup_exported: "Cópia de segurança JSON descarregada",
+        toast_backup_restored: "Base de dados restaurada a partir do ficheiro JSON",
+        reset_confirm_title: "Repor os dados de demonstração?",
+        reset_confirm_desc: "Esta ação irá restaurar os pacientes, consultas e membros da equipa iniciais.",
+        reset_confirm_btn: "Sim, repor"
+      }
+    };
+
+    const STORAGE_KEY = 'clinique_santeplus_medicore_pro_v1';
+    const LANG_STORAGE_KEY = 'clinique_santeplus_lang';
+    const SESSION_STORAGE_KEY = 'clinique_santeplus_session';
+
+    const USER_PROFILES = {
+      admin: { id: 'USR-01', login: 'admin', pass: 'admin123', name: 'Dr. Aminata Diallo (Admin)', role: 'admin', avatar: 'AD', badgeClass: 'bg-teal-500/20 text-teal-300 border-teal-500/30' },
+      doctor: { id: 'USR-02', login: 'dr.diallo', pass: 'med123', name: 'Dr. Aminata Diallo', role: 'doctor', avatar: 'DD', badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' },
+      secretary: { id: 'USR-03', login: 'sec.ndiaye', pass: 'sec123', name: 'Fatou Ndiaye', role: 'secretary', avatar: 'FN', badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+      nurse: { id: 'USR-04', login: 'inf.gomes', pass: 'inf123', name: 'Ibrahima Gomis', role: 'nurse', avatar: 'IG', badgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' }
+    };
+
+    let appState = {
+      lang: 'fr',
+      isAuthenticated: false,
+      currentRole: 'admin',
+      currentView: 'dashboard',
+      patientFilterStatus: 'ALL',
+      patientSearchQuery: '',
+      consultFilter: 'ALL',
+      patients: [],
+      consultations: [],
+      staff: [],
+      auditLogs: []
+    };
+
+    let chartsInstances = {};
+
+    function t(key) {
+      return (TRANSLATIONS[appState.lang] && TRANSLATIONS[appState.lang][key]) || TRANSLATIONS['fr'][key] || key;
+    }
+
+    function translateStatus(internalStatus) {
+      const map = {
+        'En traitement': t('status_treatment'),
+        'Hospitalisé': t('status_hospitalized'),
+        'Guéri': t('status_recovered'),
+        'Sorti': t('status_discharged'),
+        'Transféré': t('status_transferred')
+      };
+      return map[internalStatus] || internalStatus;
+    }
+
+    function translateRoleLabel(roleKey) {
+      const map = {
+        admin: t('role_admin'),
+        doctor: t('role_doctor'),
+        secretary: t('role_secretary'),
+        nurse: t('role_nurse')
+      };
+      return map[roleKey] || roleKey;
+    }
+
+    // ============================================================================
+    // DONNÉES DE DÉMONSTRATION INITIALES
+    // ============================================================================
+    function getInitialDemoData() {
+      const today = new Date().toISOString().split('T')[0];
+      return {
+        patients: [
+          {
+            id: 'PAT-2026-0001',
+            nin: '1754198400412',
+            bloodGroup: 'O+',
+            insurance: 'IPM Éducation — N° 44892',
+            bloodPressure: '125/80 mmHg',
+            temperature: '38.6 °C',
+            weight: '74 kg',
+            roomBed: 'Ambulatoire',
+            lastName: 'Bâ',
+            firstName: 'Ousmane',
+            gender: 'Masculin',
+            birthDate: '1984-05-14',
+            address: 'Quartier Escale, Rue du Commerce, Ziguinchor',
+            phone: '+221 77 542 18 90',
+            email: 'ousmane.ba@email.sn',
+            profession: 'Enseignant',
+            emergencyContact: 'Mariama Bâ (Épouse) - 77 612 44 10',
+            status: 'En traitement',
+            reason: 'Fièvre persistante, maux de tête et fatigue intense',
+            disease: 'Paludisme simple',
+            symptoms: 'Fièvre 39.2°C, frissons, céphalées frontales, courbatures',
+            medicalHistory: 'Hypertension légère suivie depuis 2023',
+            allergies: 'Pénicilline',
+            diagnosis: 'Accès palustre simple confirmé par TDR positif',
+            exams: 'TDR Paludisme (+), Goutte épaisse, NFS',
+            treatment: 'Protocole antipaludique oral 3 jours + antipyrétique',
+            medications: 'Artéméther-Luméfantrine 80/480mg, Paracétamol 1g',
+            admissionDate: today,
+            treatmentStartDate: today,
+            followUpDate: '2026-12-02',
+            healthEvolution: 'En amélioration — Baisse de la fièvre dès J2.',
+            dischargeDate: '',
+            observations: 'Bonne hydratation, dormir sous moustiquaire imprégnée.',
+            createdAt: '2026-11-20T09:15:00'
+          },
+          {
+            id: 'PAT-2026-0002',
+            nin: '2845199500891',
+            bloodGroup: 'A+',
+            insurance: 'Mutuelle SantéPlus — N° 10943',
+            bloodPressure: '115/75 mmHg',
+            temperature: '37.1 °C',
+            weight: '62 kg',
+            roomBed: 'Pneumologie — Ch. 104 / Lit B',
+            lastName: 'Diatta',
+            firstName: 'Awa',
+            gender: 'Féminin',
+            birthDate: '1995-09-22',
+            address: 'Boucotte Sud, Ziguinchor',
+            phone: '+221 78 310 45 22',
+            email: 'awa.diatta@email.sn',
+            profession: 'Commerçante',
+            emergencyContact: 'Ibrahima Diatta (Frère) - 76 490 11 08',
+            status: 'Hospitalisé',
+            reason: 'Crise d’asthme aiguë et détresse respiratoire modérée',
+            disease: 'Asthme bronchique aigu',
+            symptoms: 'Dyspnée sifflante, toux sèche nocturne, oppression thoracique',
+            medicalHistory: 'Asthme allergique connu depuis l’enfance',
+            allergies: 'Poussière, acariens, aspirine',
+            diagnosis: 'Exacerbation aiguë d’asthme nécessitant nébulisation',
+            exams: 'Oxymétrie (SpO2 91%), Radiographie thoracique, DEP',
+            treatment: 'Oxygénothérapie, nébulisations bronchodilatateurs, corticoïdes IV',
+            medications: 'Salbutamol nébulisation, Méthylprednisolone 40mg',
+            admissionDate: '2026-11-23',
+            treatmentStartDate: '2026-11-23',
+            followUpDate: '2026-11-28',
+            healthEvolution: 'Stable sous surveillance — SpO2 à 97%.',
+            dischargeDate: '',
+            observations: 'Sortie envisageable sous 48h si absence de récidive.',
+            createdAt: '2026-11-23T14:30:00'
+          },
+          {
+            id: 'PAT-2026-0003',
+            nin: '1620196200157',
+            bloodGroup: 'B+',
+            insurance: 'IPRES Retraite — N° 77310',
+            bloodPressure: '130/82 mmHg',
+            temperature: '36.8 °C',
+            weight: '79 kg',
+            roomBed: 'Sorti',
+            lastName: 'Sarr',
+            firstName: 'Mamadou',
+            gender: 'Masculin',
+            birthDate: '1962-02-10',
+            address: 'Kandé, Ziguinchor',
+            phone: '+221 77 890 33 15',
+            email: '',
+            profession: 'Retraité',
+            emergencyContact: 'Khady Sarr (Fille) - 77 204 88 99',
+            status: 'Guéri',
+            reason: 'Douleurs épigastriques et brûlures d’estomac',
+            disease: 'Gastrite aiguë',
+            symptoms: 'Épigastralgies post-prandiales, reflux acide, nausées',
+            medicalHistory: 'Aucun antécédent chirurgical',
+            allergies: 'Aucune allergie connue',
+            diagnosis: 'Gastrite aiguë sans signe de complication',
+            exams: 'Échographie abdominale normale, Bilan biologique',
+            treatment: 'IPP pendant 4 semaines + régime alimentaire adapté',
+            medications: 'Oméprazole 20mg, Alginate de sodium',
+            admissionDate: '2026-10-12',
+            treatmentStartDate: '2026-10-12',
+            followUpDate: '2026-11-10',
+            healthEvolution: 'Guérison complète — Disparition des douleurs.',
+            dischargeDate: '2026-11-10',
+            observations: 'Éviter les aliments trop épicés et les AINS.',
+            createdAt: '2026-10-12T10:00:00'
+          },
+          {
+            id: 'PAT-2026-0004',
+            nin: '2910201600534',
+            bloodGroup: 'O-',
+            insurance: 'Couverture Famille — N° 88214',
+            bloodPressure: '105/65 mmHg',
+            temperature: '38.4 °C',
+            weight: '31 kg',
+            roomBed: 'Pédiatrie — Ambulatoire',
+            lastName: 'Mendès',
+            firstName: 'Clarisse',
+            gender: 'Féminin',
+            birthDate: '2016-11-05',
+            address: 'Néma 2, Ziguinchor',
+            phone: '+221 76 551 70 12',
+            email: 'famille.mendes@email.sn',
+            profession: 'Élève',
+            emergencyContact: 'Paul Mendès (Père) - 77 412 09 34',
+            status: 'En traitement',
+            reason: 'Angine fébrile et difficultés à avaler',
+            disease: 'Angine bactérienne',
+            symptoms: 'Fièvre 38.8°C, odynophagie, amygdales érythémato-pultacées',
+            medicalHistory: 'Vaccins à jour',
+            allergies: 'Aucune connue',
+            diagnosis: 'Angine aiguë bactérienne',
+            exams: 'Examen ORL complet',
+            treatment: 'Antibiothérapie adaptée au poids pendant 6 jours',
+            medications: 'Amoxicilline suspension buvable, Paracétamol sirop',
+            admissionDate: '2026-11-22',
+            treatmentStartDate: '2026-11-22',
+            followUpDate: '2026-11-29',
+            healthEvolution: 'Bonne réponse au traitement après 48h.',
+            dischargeDate: '',
+            observations: 'Poursuivre l’antibiotique jusqu’à la fin.',
+            createdAt: '2026-11-22T11:20:00'
+          },
+          {
+            id: 'PAT-2026-0005',
+            nin: '1701197500763',
+            bloodGroup: 'AB+',
+            insurance: 'Assurance Transport — N° 55109',
+            bloodPressure: '125/80 mmHg',
+            temperature: '36.9 °C',
+            weight: '83 kg',
+            roomBed: 'Suivi Cardiologie',
+            lastName: 'Cissé',
+            firstName: 'Abdou',
+            gender: 'Masculin',
+            birthDate: '1975-07-30',
+            address: 'Tilène, Ziguinchor',
+            phone: '+221 77 123 98 76',
+            email: 'abdou.cisse@email.sn',
+            profession: 'Chauffeur',
+            emergencyContact: 'Ndeye Cissé (Épouse) - 77 998 12 45',
+            status: 'Guéri',
+            reason: 'Bilan tensionnel et vertiges',
+            disease: 'Hypertension artérielle (HTA)',
+            symptoms: 'Céphalées occipitales matinales, acouphènes',
+            medicalHistory: 'HTA familiale',
+            allergies: 'Aucune',
+            diagnosis: 'Hypertension artérielle grade 1 équilibrée',
+            exams: 'ECG, Bilan rénal, Glycémie à jeun',
+            treatment: 'Antihypertenseur quotidien + règles hygiéno-diététiques',
+            medications: 'Amlodipine 5mg',
+            admissionDate: '2026-09-15',
+            treatmentStartDate: '2026-09-15',
+            followUpDate: '2026-12-15',
+            healthEvolution: 'Tension stabilisée à 125/80 mmHg.',
+            dischargeDate: '2026-10-20',
+            observations: 'Réduire le sel, activité physique régulière.',
+            createdAt: '2026-09-15T08:45:00'
+          }
+        ],
+        consultations: [
+          {
+            id: 'CONS-1001',
+            patientId: 'PAT-2026-0001',
+            patientName: 'Ousmane Bâ',
+            date: '2026-11-20T09:30',
+            doctor: 'Dr. Moussa Ndiaye',
+            reason: 'Fièvre élevée et frissons depuis 48h',
+            observations: 'Patient asthénique, T° 39.2°C, TA 120/75 mmHg.',
+            diagnosis: 'Paludisme simple',
+            prescriptions: 'Artéméther-Luméfantrine 80/480mg (1 cp matin et soir x 3j), Paracétamol 1g',
+            nextAppointment: '2026-12-02'
+          },
+          {
+            id: 'CONS-1002',
+            patientId: 'PAT-2026-0002',
+            patientName: 'Awa Diatta',
+            date: '2026-11-23T14:45',
+            doctor: 'Dr. Aminata Diallo',
+            reason: 'Gêne respiratoire aiguë',
+            observations: 'Sibilants diffus aux deux champs pulmonaires, FR 28/min.',
+            diagnosis: 'Crise d’asthme aiguë modérée',
+            prescriptions: 'Nébulisation Salbutamol + Corticothérapie IV',
+            nextAppointment: '2026-11-28'
+          },
+          {
+            id: 'CONS-1003',
+            patientId: 'PAT-2026-0004',
+            patientName: 'Clarisse Mendès',
+            date: '2026-11-22T11:30',
+            doctor: 'Dr. Marième Faye',
+            reason: 'Mal de gorge et fièvre',
+            observations: 'Enfant de 10 ans, poids 31 kg, T° 38.8°C.',
+            diagnosis: 'Angine bactérienne',
+            prescriptions: 'Amoxicilline 500mg/5ml (2x/jour pendant 6 jours)',
+            nextAppointment: '2026-11-29'
+          }
+        ],
+        staff: [
+          { id: 'STF-01', name: 'Dr. Aminata Diallo', specialty: 'Médecine Interne & Pneumologie', phone: '+221 77 600 11 22', roleTitle: 'Directrice Médicale', loginId: 'dr.diallo', accessLevel: 'doctor', status: 'Actif' },
+          { id: 'STF-02', name: 'Dr. Moussa Ndiaye', specialty: 'Médecine Générale', phone: '+221 77 455 88 99', roleTitle: 'Médecin Chef de Service', loginId: 'm.ndiaye', accessLevel: 'doctor', status: 'En garde' },
+          { id: 'STF-03', name: 'Dr. Marième Faye', specialty: 'Pédiatrie', phone: '+221 78 210 33 44', roleTitle: 'Médecin Pédiatre', loginId: 'm.faye', accessLevel: 'doctor', status: 'Actif' },
+          { id: 'STF-04', name: 'Fatou Ndiaye', specialty: 'Administration & Accueil', phone: '+221 76 890 12 34', roleTitle: 'Secrétaire Médicale', loginId: 'sec.ndiaye', accessLevel: 'secretary', status: 'Actif' },
+          { id: 'STF-05', name: 'Ibrahima Gomis', specialty: 'Soins Infirmiers', phone: '+221 77 321 54 76', roleTitle: 'Infirmier Major', loginId: 'inf.gomes', accessLevel: 'nurse', status: 'En garde' }
+        ],
+        auditLogs: [
+          { id: 'LOG-1', timestamp: '2026-11-24 08:30:12', user: 'Dr. Aminata Diallo (Admin)', action: 'Session', details: 'Connexion sécurisée à la plateforme' },
+          { id: 'LOG-2', timestamp: '2026-11-23 14:45:00', user: 'Dr. Aminata Diallo (Admin)', action: 'Hospitalisation', details: 'Admission PAT-2026-0002 (Awa Diatta)' },
+          { id: 'LOG-3', timestamp: '2026-11-22 11:25:40', user: 'Fatou Ndiaye (Secrétaire)', action: 'Nouveau Patient', details: 'Enregistrement PAT-2026-0004 (Clarisse Mendès)' }
+        ]
+      };
+    }
+
+    // ============================================================================
+    // PERSISTANCE & GESTION DE LANGUE
+    // ============================================================================
+    function loadState() {
+      try {
+        const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
+        if (savedLang && ['fr', 'en', 'pt'].includes(savedLang)) {
+          appState.lang = savedLang;
+        }
+
+        const savedSession = localStorage.getItem(SESSION_STORAGE_KEY);
+        if (savedSession && USER_PROFILES[savedSession]) {
+          appState.currentRole = savedSession;
+          appState.isAuthenticated = true;
+        }
+
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          appState.patients = parsed.patients || [];
+          appState.consultations = parsed.consultations || [];
+          appState.staff = parsed.staff || [];
+          appState.auditLogs = parsed.auditLogs || [];
+        } else {
+          const demo = getInitialDemoData();
+          Object.assign(appState, demo);
+          saveState();
+        }
+      } catch (e) {
+        console.error(e);
+        Object.assign(appState, getInitialDemoData());
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          patients: appState.patients,
+          consultations: appState.consultations,
+          staff: appState.staff,
+          auditLogs: appState.auditLogs
+        }));
+        const countEl = document.getElementById('nav-patient-count');
+        if (countEl) countEl.textContent = appState.patients.length;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function setLanguage(lang) {
+      if (!['fr', 'en', 'pt'].includes(lang)) return;
+      appState.lang = lang;
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+      document.documentElement.lang = lang;
+      applyStaticTranslations();
+      renderCurrentView();
+      showToast(t('toast_lang_changed'));
+    }
+
+    function applyStaticTranslations() {
+      document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+        if (btn.dataset.langBtn === appState.lang) {
+          btn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition bg-teal-600 text-white shadow-2xs';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition text-slate-600 hover:bg-slate-200';
+        }
+      });
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+      });
+
+      const searchInput = document.getElementById('global-search-input');
+      if (searchInput) searchInput.placeholder = t('search_placeholder');
+
+      const roleSelect = document.getElementById('role-switcher');
+      if (roleSelect) {
+        roleSelect.options[0].text = t('role_admin_desc');
+        roleSelect.options[1].text = t('role_doctor_desc');
+        roleSelect.options[2].text = t('role_secretary_desc');
+        roleSelect.options[3].text = t('role_nurse_desc');
+        roleSelect.value = appState.currentRole;
+      }
+
+      document.getElementById('user-role-badge').textContent = translateRoleLabel(appState.currentRole);
+      document.getElementById('role-banner-text').textContent = t('secretary_banner');
+
+      const lTitle = document.getElementById('login-title');
+      if (lTitle) {
+        lTitle.textContent = t('login_title');
+        document.getElementById('login-subtitle').textContent = t('login_subtitle');
+        document.getElementById('login-quick-label').textContent = t('login_quick_label');
+        document.getElementById('login-user-label').textContent = t('login_user_label');
+        document.getElementById('login-pass-label').textContent = t('login_pass_label');
+        document.querySelector('#login-submit-btn span').textContent = t('login_submit_btn');
+      }
+    }
+
+    function addAuditLog(action, details) {
+      const profile = USER_PROFILES[appState.currentRole];
+      const now = new Date();
+      const timestamp = now.toLocaleDateString('fr-CA') + ' ' + now.toTimeString().split(' ')[0];
+      appState.auditLogs.unshift({
+        id: 'LOG-' + Date.now(),
+        timestamp,
+        user: `${profile.name} (${translateRoleLabel(appState.currentRole)})`,
+        action,
+        details
+      });
+      if (appState.auditLogs.length > 100) appState.auditLogs.pop();
+      saveState();
+    }
+
+    // ============================================================================
+    // UTILITAIRES MÉTIERS
+    // ============================================================================
+    function calculateAge(birthDateStr) {
+      if (!birthDateStr) return '—';
+      const birth = new Date(birthDateStr);
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+      return age >= 0 ? `${age} ${t('years_old')}` : '—';
+    }
+
+    function getNumericAge(birthDateStr) {
+      if (!birthDateStr) return null;
+      const birth = new Date(birthDateStr);
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+      return age;
+    }
+
+    function generateUniquePatientId() {
+      const year = new Date().getFullYear();
+      const maxNum = appState.patients.reduce((max, p) => {
+        const parts = p.id.split('-');
+        const num = parseInt(parts[2], 10);
+        return !isNaN(num) && num > max ? num : max;
+      }, 0);
+      return `PAT-${year}-${String(maxNum + 1).padStart(4, '0')}`;
+    }
+
+    function getStatusBadge(status) {
+      const map = {
+        'En traitement': 'bg-blue-100 text-blue-700 border-blue-200',
+        'Hospitalisé': 'bg-rose-100 text-rose-700 border-rose-200',
+        'Guéri': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        'Sorti': 'bg-teal-100 text-teal-700 border-teal-200',
+        'Transféré': 'bg-amber-100 text-amber-700 border-amber-200'
+      };
+      const icons = {
+        'En traitement': 'fa-pills',
+        'Hospitalisé': 'fa-bed-pulse',
+        'Guéri': 'fa-circle-check',
+        'Sorti': 'fa-door-open',
+        'Transféré': 'fa-ambulance'
+      };
+      const cls = map[status] || 'bg-slate-100 text-slate-700 border-slate-200';
+      const icon = icons[status] || 'fa-circle-info';
+      return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${cls}">
+        <i class="fa-solid ${icon} text-[10px]"></i> ${translateStatus(status)}
+      </span>`;
+    }
+
+    function isMedicalAccessAllowed() {
+      return appState.currentRole !== 'secretary';
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const colors = {
+        success: 'bg-slate-900 text-white border-teal-500',
+        warning: 'bg-amber-600 text-white border-amber-300',
+        error: 'bg-rose-600 text-white border-rose-300'
+      };
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border-l-4 ${colors[type] || colors.success} text-xs sm:text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid fa-circle-check text-teal-400 text-base"></i><span>${message}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ============================================================================
+    // NAVIGATION, SESSION & RECHERCHE GLOBALE
+    // ============================================================================
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('sidebar-overlay').classList.toggle('hidden');
+    }
+
+    function openLoginScreen() {
+      document.getElementById('login-error-box').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('login-screen').classList.add('flex');
+    }
+
+    function logoutUser() {
+      addAuditLog('Déconnexion', `${USER_PROFILES[appState.currentRole].name}`);
+      appState.isAuthenticated = false;
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      openLoginScreen();
+    }
+
+    function quickLogin(roleKey) {
+      const profile = USER_PROFILES[roleKey];
+      if (!profile) return;
+      document.getElementById('login-username-input').value = profile.login;
+      document.getElementById('login-password-input').value = profile.pass;
+      completeLogin(roleKey);
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const userVal = document.getElementById('login-username-input').value.trim().toLowerCase();
+      const passVal = document.getElementById('login-password-input').value.trim();
+      const errBox = document.getElementById('login-error-box');
+
+      const matchedRole = Object.keys(USER_PROFILES).find(key => {
+        const p = USER_PROFILES[key];
+        return p.login.toLowerCase() === userVal && p.pass === passVal;
+      });
+
+      if (!matchedRole) {
+        errBox.textContent = t('login_invalid');
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      errBox.classList.add('hidden');
+      completeLogin(matchedRole);
+    }
+
+    function completeLogin(roleKey) {
+      appState.isAuthenticated = true;
+      localStorage.setItem(SESSION_STORAGE_KEY, roleKey);
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('flex');
+      switchUserRole(roleKey);
+    }
+
+    function switchUserRole(newRole) {
+      appState.currentRole = newRole;
+      localStorage.setItem(SESSION_STORAGE_KEY, newRole);
+      const profile = USER_PROFILES[newRole];
+
+      document.getElementById('user-avatar').textContent = profile.avatar;
+      document.getElementById('user-name').textContent = profile.name;
+      const badge = document.getElementById('user-role-badge');
+      badge.textContent = translateRoleLabel(newRole);
+      badge.className = `inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border ${profile.badgeClass}`;
+      document.getElementById('role-switcher').value = newRole;
+
+      const banner = document.getElementById('role-banner');
+      if (newRole === 'secretary') {
+        banner.classList.remove('hidden');
+        document.getElementById('role-banner-text').textContent = t('secretary_banner');
+      } else {
+        banner.classList.add('hidden');
+      }
+
+      addAuditLog('Session / Rôle', `${profile.name} (${translateRoleLabel(newRole)})`);
+      showToast(`${t('toast_role_changed')} ${translateRoleLabel(newRole)}`);
+      renderCurrentView();
+    }
+
+    function navigateTo(view) {
+      appState.currentView = view;
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.dataset.nav === view) {
+          btn.className = 'nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-teal-600 text-white shadow-md shadow-teal-900/20';
+        } else {
+          btn.className = 'nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-all';
+        }
+      });
+
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 1024) {
+        toggleSidebar();
+      }
+      renderCurrentView();
+    }
+
+    function handleGlobalSearch(query) {
+      const box = document.getElementById('global-search-results');
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        box.classList.add('hidden');
+        return;
+      }
+
+      const matches = appState.patients.filter(p =>
+        p.id.toLowerCase().includes(q) ||
+        (p.nin || '').toLowerCase().includes(q) ||
+        p.lastName.toLowerCase().includes(q) ||
+        p.firstName.toLowerCase().includes(q) ||
+        `${p.firstName} ${p.lastName}`.toLowerCase().includes(q)
+      );
+
+      if (matches.length === 0) {
+        box.innerHTML = `<div class="p-4 text-sm text-slate-500 text-center">${t('no_search_result')} « ${query} »</div>`;
+      } else {
+        box.innerHTML = matches.map(p => `
+          <button onclick="openPatientDetails('${p.id}'); document.getElementById('global-search-results').classList.add('hidden');" class="w-full text-left px-4 py-3 hover:bg-slate-50 border-b border-slate-100 last:border-none flex items-center justify-between gap-3 transition">
+            <div>
+              <p class="text-sm font-bold text-slate-800">${p.firstName} ${p.lastName} <span class="text-xs font-mono text-teal-600 ml-1">(${p.id})</span></p>
+              <p class="text-xs text-slate-500">NIN: <span class="font-mono font-semibold text-slate-700">${p.nin || '—'}</span> • ${p.gender === 'Féminin' ? t('gender_f') : t('gender_m')} • ${calculateAge(p.birthDate)} • ${p.phone}</p>
+            </div>
+            ${getStatusBadge(p.status)}
+          </button>
+        `).join('');
+      }
+      box.classList.remove('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+      const input = document.getElementById('global-search-input');
+      const results = document.getElementById('global-search-results');
+      if (input && results && !input.contains(e.target) && !results.contains(e.target)) {
+        results.classList.add('hidden');
+      }
+    });
+
+    // ============================================================================
+    // RENDU DES VUES
+    // ============================================================================
+    function renderCurrentView() {
+      const main = document.getElementById('main-content');
+      const countEl = document.getElementById('nav-patient-count');
+      if (countEl) countEl.textContent = appState.patients.length;
+
+      switch (appState.currentView) {
+        case 'dashboard': renderDashboard(main); break;
+        case 'patients': renderPatientsView(main); break;
+        case 'consultations': renderConsultationsView(main); break;
+        case 'staff': renderStaffView(main); break;
+        case 'stats': renderStatsView(main); break;
+        case 'security': renderSecurityView(main); break;
+      }
+    }
+
+    // 1. TABLEAU DE BORD
+    function renderDashboard(container) {
+      const totalPatients = appState.patients.length;
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const newPatientsMonth = appState.patients.filter(p => (p.admissionDate || '').startsWith(currentMonth)).length;
+      const hospitalized = appState.patients.filter(p => p.status === 'Hospitalisé').length;
+      const recovered = appState.patients.filter(p => p.status === 'Guéri' || p.status === 'Sorti').length;
+      const totalConsultations = appState.consultations.length;
+      const inTreatment = appState.patients.filter(p => p.status === 'En traitement').length;
+
+      const upcomingAppointments = appState.consultations
+        .filter(c => c.nextAppointment)
+        .sort((a, b) => a.nextAppointment.localeCompare(b.nextAppointment));
+
+      container.innerHTML = `
+        <div class="hero-banner rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-white relative overflow-hidden">
+          <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-white/5 pointer-events-none"></div>
+          <div class="absolute right-24 -bottom-16 w-40 h-40 rounded-full bg-teal-400/10 pointer-events-none"></div>
+          <div class="relative z-10">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-white/15 text-teal-200 border border-white/20 backdrop-blur-xs mb-2.5">
+              <i class="fa-solid fa-sparkles"></i> MediCore Pro • Plateforme Certifiée
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">${t('dash_title')}</h2>
+            <p class="text-sm text-blue-100/90 mt-1">${t('dash_subtitle')}</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5 relative z-10">
+            <button onclick="openPatientForm()" class="px-4 py-2.5 rounded-xl bg-white text-[#0F4C81] hover:bg-teal-50 text-sm font-bold shadow-lg flex items-center gap-2 transition">
+              <i class="fa-solid fa-user-plus text-teal-600"></i> ${t('btn_new_patient')}
+            </button>
+            <button onclick="openConsultationForm()" class="px-4 py-2.5 rounded-xl bg-teal-500/30 hover:bg-teal-500/40 text-white border border-white/25 text-sm font-semibold backdrop-blur-xs flex items-center gap-2 transition">
+              <i class="fa-solid fa-notes-medical"></i> ${t('btn_new_consultation')}
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 Cartes KPI -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div class="glass-card kpi-card p-5 rounded-2xl flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">${t('kpi_total_patients')}</p>
+              <p class="text-3xl font-extrabold text-slate-900 mt-1">${totalPatients}</p>
+              <p class="text-xs text-teal-600 font-semibold mt-1.5"><i class="fa-solid fa-database mr-1"></i> ${t('kpi_total_sub')}</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center text-xl shadow-md shadow-teal-500/20"><i class="fa-solid fa-users"></i></div>
+          </div>
+
+          <div class="glass-card kpi-card p-5 rounded-2xl flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">${t('kpi_new_patients')}</p>
+              <p class="text-3xl font-extrabold text-slate-900 mt-1">${newPatientsMonth}</p>
+              <p class="text-xs text-cyan-700 font-semibold mt-1.5"><i class="fa-solid fa-arrow-trend-up mr-1"></i> ${t('kpi_new_sub')}</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center text-xl shadow-md shadow-cyan-500/20"><i class="fa-solid fa-user-plus"></i></div>
+          </div>
+
+          <div class="glass-card kpi-card p-5 rounded-2xl flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">${t('kpi_hospitalized')}</p>
+              <p class="text-3xl font-extrabold text-rose-600 mt-1">${hospitalized}</p>
+              <p class="text-xs text-slate-500 mt-1.5">${t('kpi_hospitalized_sub')}</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center text-xl shadow-md shadow-rose-500/20"><i class="fa-solid fa-bed-pulse"></i></div>
+          </div>
+
+          <div class="glass-card kpi-card p-5 rounded-2xl flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">${t('kpi_recovered')}</p>
+              <p class="text-3xl font-extrabold text-emerald-600 mt-1">${recovered}</p>
+              <p class="text-xs text-emerald-600 font-semibold mt-1.5"><i class="fa-solid fa-heart-circle-check mr-1"></i> ${t('kpi_recovered_sub')}</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-xl shadow-md shadow-emerald-500/20"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+
+          <div class="glass-card kpi-card p-5 rounded-2xl flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">${t('kpi_consultations')}</p>
+              <p class="text-3xl font-extrabold text-slate-900 mt-1">${totalConsultations}</p>
+              <p class="text-xs text-indigo-600 font-semibold mt-1.5"><i class="fa-solid fa-stethoscope mr-1"></i> ${t('kpi_consultations_sub')}</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center text-xl shadow-md shadow-indigo-500/20"><i class="fa-solid fa-file-medical"></i></div>
+          </div>
+
+          <div class="glass-card kpi-card p-5 rounded-2xl flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">${t('kpi_in_treatment')}</p>
+              <p class="text-3xl font-extrabold text-[#0F4C81] mt-1">${inTreatment}</p>
+              <p class="text-xs text-slate-500 mt-1.5">${t('kpi_in_treatment_sub')}</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0F4C81] to-sky-500 text-white flex items-center justify-center text-xl shadow-md shadow-blue-900/20"><i class="fa-solid fa-pills"></i></div>
+          </div>
+        </div>
+
+        <!-- Graphiques -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-bold text-slate-800">${t('chart_monthly_title')}</h3>
+                <p class="text-xs text-slate-500">${t('chart_monthly_sub')}</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 text-xs font-semibold">${new Date().getFullYear()}</span>
+            </div>
+            <div class="h-64"><canvas id="dashboardConsultationsChart"></canvas></div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl flex flex-col">
+            <h3 class="font-bold text-slate-800">${t('chart_status_title')}</h3>
+            <p class="text-xs text-slate-500 mb-4">${t('chart_status_sub')}</p>
+            <div class="flex-1 flex items-center justify-center min-h-[210px]"><canvas id="dashboardStatusChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Pathologies fréquentes (Courbe) + Rendez-vous & Dossiers récents -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="glass-card p-6 rounded-2xl flex flex-col">
+            <h3 class="font-bold text-slate-800">${t('chart_diseases')}</h3>
+            <p class="text-xs text-slate-500 mb-4">Courbe épidémiologique</p>
+            <div class="flex-1 min-h-[200px]"><canvas id="dashboardDiseaseBarChart"></canvas></div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i class="fa-regular fa-calendar-check text-teal-600"></i> ${t('upcoming_appointments')}</h3>
+              <button onclick="navigateTo('consultations')" class="text-xs font-semibold text-teal-600 hover:underline">${t('view_all')}</button>
+            </div>
+            <div class="divide-y divide-slate-100">
+              ${upcomingAppointments.length === 0 ? `<p class="p-6 text-sm text-slate-500 text-center">${t('no_appointments')}</p>` :
+                upcomingAppointments.slice(0, 4).map(c => `
+                  <div class="px-5 py-3 flex items-center justify-between gap-2 hover:bg-slate-50 transition">
+                    <div class="min-w-0">
+                      <p class="text-xs font-bold text-slate-800 truncate">${c.patientName}</p>
+                      <p class="text-[11px] text-slate-500 truncate">${c.doctor} • ${c.reason}</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-[11px] font-bold shrink-0">
+                      ${c.nextAppointment}
+                    </span>
+                  </div>
+                `).join('')
+              }
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i class="fa-solid fa-clock-rotate-left text-cyan-600"></i> ${t('recent_patients')}</h3>
+              <button onclick="navigateTo('patients')" class="text-xs font-semibold text-teal-600 hover:underline">${t('manage_patients')}</button>
+            </div>
+            <div class="divide-y divide-slate-100">
+              ${appState.patients.slice(0, 4).map(p => `
+                <div onclick="openPatientDetails('${p.id}')" class="px-5 py-3 flex items-center justify-between gap-2 hover:bg-slate-50 cursor-pointer transition">
+                  <div class="min-w-0">
+                    <p class="text-xs font-bold text-slate-800 truncate">${p.firstName} ${p.lastName}</p>
+                    <p class="text-[11px] text-slate-500 font-mono">${p.id} • ${calculateAge(p.birthDate)}</p>
+                  </div>
+                  ${getStatusBadge(p.status)}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      initDashboardCharts();
+    }
+
+    function initDashboardCharts() {
+      if (chartsInstances.dashConsult) chartsInstances.dashConsult.destroy();
+      if (chartsInstances.dashStatus) chartsInstances.dashStatus.destroy();
+      if (chartsInstances.dashDiseaseBar) chartsInstances.dashDiseaseBar.destroy();
+
+      const monthNamesByLang = {
+        fr: ['Juin', 'Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'],
+        en: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        pt: ['Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+      };
+
+      const ctx1 = document.getElementById('dashboardConsultationsChart');
+      if (ctx1) {
+        chartsInstances.dashConsult = new Chart(ctx1, {
+          type: 'line',
+          data: {
+            labels: monthNamesByLang[appState.lang],
+            datasets: [
+              {
+                label: t('nav_consultations'),
+                data: [5, 7, 6, 9, 12, appState.consultations.length + 8, 4],
+                borderColor: '#0D9488',
+                backgroundColor: 'rgba(13, 148, 136, 0.12)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.35
+              },
+              {
+                label: t('nav_patients'),
+                data: [3, 4, 4, 6, 8, appState.patients.length + 4, 2],
+                borderColor: '#0F4C81',
+                backgroundColor: 'rgba(15, 76, 129, 0.08)',
+                borderWidth: 2.5,
+                fill: false,
+                tension: 0.35
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+            scales: {
+              y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: '#f1f5f9' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      const ctx2 = document.getElementById('dashboardStatusChart');
+      if (ctx2) {
+        const rawStatuses = ['En traitement', 'Hospitalisé', 'Guéri', 'Sorti', 'Transféré'];
+        const translatedLabels = rawStatuses.map(s => translateStatus(s));
+        const dataCounts = rawStatuses.map(s => appState.patients.filter(p => p.status === s).length);
+
+        chartsInstances.dashStatus = new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: translatedLabels,
+            datasets: [{
+              data: dataCounts,
+              backgroundColor: ['#3b82f6', '#f43f5e', '#10b981', '#14b8a6', '#f59e0b'],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 11, font: { size: 11 } } } }
+          }
+        });
+      }
+
+      const ctx3 = document.getElementById('dashboardDiseaseBarChart');
+      if (ctx3) {
+        const diseaseCounts = {};
+        appState.patients.forEach(p => {
+          const d = p.disease || 'Autre';
+          diseaseCounts[d] = (diseaseCounts[d] || 0) + 1;
+        });
+        chartsInstances.dashDiseaseBar = new Chart(ctx3, {
+          type: 'line',
+          data: {
+            labels: Object.keys(diseaseCounts),
+            datasets: [{
+              label: 'Patients',
+              data: Object.values(diseaseCounts),
+              borderColor: '#0F4C81',
+              backgroundColor: 'rgba(15, 76, 129, 0.14)',
+              pointBackgroundColor: '#0D9488',
+              pointRadius: 5,
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } },
+              x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+            }
+          }
+        });
+      }
+    }
+
+    // 2. PATIENTS & DOSSIERS
+    function renderPatientsView(container) {
+      const filterKeys = [
+        { key: 'ALL', label: t('all') },
+        { key: 'En traitement', label: t('status_treatment') },
+        { key: 'Hospitalisé', label: t('status_hospitalized') },
+        { key: 'FORMER', label: t('filter_former_patients') },
+        { key: 'Transféré', label: t('status_transferred') }
+      ];
+
+      const q = appState.patientSearchQuery.toLowerCase();
+      const filtered = appState.patients.filter(p => {
+        const matchStatus =
+          appState.patientFilterStatus === 'ALL' ? true :
+          appState.patientFilterStatus === 'FORMER' ? (p.status === 'Guéri' || p.status === 'Sorti') :
+          p.status === appState.patientFilterStatus;
+        const matchQuery = !q ||
+          p.id.toLowerCase().includes(q) ||
+          (p.nin || '').toLowerCase().includes(q) ||
+          p.lastName.toLowerCase().includes(q) ||
+          p.firstName.toLowerCase().includes(q) ||
+          p.phone.toLowerCase().includes(q);
+        return matchStatus && matchQuery;
+      });
+
+      const canSeeMedical = isMedicalAccessAllowed();
+
+      container.innerHTML = `
+        <div class="glass-card rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-extrabold text-slate-900">${t('patients_title')}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">${t('patients_subtitle')}</p>
+          </div>
+          <button onclick="openPatientForm()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#0F4C81] to-teal-600 hover:opacity-95 text-white text-sm font-semibold shadow-md shadow-teal-600/20 flex items-center gap-2 self-start sm:self-auto transition">
+            <i class="fa-solid fa-user-plus"></i> ${t('register_patient_btn')}
+          </button>
+        </div>
+
+        <div class="glass-card p-4 rounded-2xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          <div class="flex flex-wrap gap-1.5">
+            ${filterKeys.map(f => `
+              <button onclick="appState.patientFilterStatus='${f.key}'; renderPatientsView(document.getElementById('main-content'))"
+                class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${appState.patientFilterStatus === f.key ? 'bg-gradient-to-r from-[#0F4C81] to-teal-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                ${f.label}
+              </button>
+            `).join('')}
+          </div>
+
+          <div class="relative min-w-[260px]">
+            <i class="fa-solid fa-filter absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input
+              type="text"
+              value="${appState.patientSearchQuery}"
+              oninput="appState.patientSearchQuery=this.value; renderPatientsView(document.getElementById('main-content'))"
+              placeholder="${t('filter_placeholder')}"
+              class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50/90 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <th class="py-3.5 px-4">${t('col_id')}</th>
+                  <th class="py-3.5 px-4">${t('f_nin')}</th>
+                  <th class="py-3.5 px-4">${t('col_patient')}</th>
+                  <th class="py-3.5 px-4">${t('col_age_sex')}</th>
+                  <th class="py-3.5 px-4">${t('col_contact')}</th>
+                  <th class="py-3.5 px-4">${t('col_pathology')}</th>
+                  <th class="py-3.5 px-4">${t('col_status')}</th>
+                  <th class="py-3.5 px-4 text-right">${t('actions')}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-sm">
+                ${filtered.length === 0 ? `
+                  <tr><td colspan="8" class="py-10 text-center text-slate-500">${t('no_patient_match')}</td></tr>
+                ` : filtered.map(p => `
+                  <tr class="hover:bg-teal-50/30 transition">
+                    <td class="py-3.5 px-4 font-mono text-xs font-bold text-teal-700 whitespace-nowrap">${p.id}</td>
+                    <td class="py-3.5 px-4 font-mono text-xs font-semibold text-slate-700 whitespace-nowrap">
+                      <span class="px-2.5 py-1 rounded-lg bg-blue-50/70 text-[#0F4C81] border border-blue-200/80">${p.nin || '—'}</span>
+                    </td>
+                    <td class="py-3.5 px-4">
+                      <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl ${p.gender === 'Féminin' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700'} flex items-center justify-center font-bold text-xs shrink-0">
+                          ${(p.firstName[0] || '') + (p.lastName[0] || '')}
+                        </div>
+                        <div class="min-w-0">
+                          <p class="font-bold text-slate-900">${p.lastName.toUpperCase()} ${p.firstName} ${p.bloodGroup ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-extrabold">${p.bloodGroup}</span>` : ''}</p>
+                          <p class="text-xs text-slate-500 truncate max-w-[160px]">${p.address}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-3.5 px-4 whitespace-nowrap">
+                      <span class="font-medium text-slate-800">${calculateAge(p.birthDate)}</span>
+                      <span class="block text-xs text-slate-400">${p.gender === 'Féminin' ? t('gender_f') : t('gender_m')}</span>
+                    </td>
+                    <td class="py-3.5 px-4 whitespace-nowrap">
+                      <p class="text-slate-800 text-xs font-medium">${p.phone}</p>
+                      <p class="text-xs text-slate-400">${p.admissionDate || '—'}</p>
+                    </td>
+                    <td class="py-3.5 px-4">
+                      ${canSeeMedical ? `
+                        <p class="font-semibold text-slate-800 text-xs">${p.disease || '—'}</p>
+                        <p class="text-xs text-slate-500 truncate max-w-[200px]">${p.reason}</p>
+                      ` : `
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 text-xs">
+                          <i class="fa-solid fa-lock text-amber-500"></i> ${t('confidential_locked')}
+                        </span>
+                      `}
+                    </td>
+                    <td class="py-3.5 px-4 whitespace-nowrap">${getStatusBadge(p.status)}</td>
+                    <td class="py-3.5 px-4 text-right whitespace-nowrap space-x-1">
+                      <button onclick="openPatientDetails('${p.id}')" class="p-2 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 transition"><i class="fa-solid fa-folder-open"></i></button>
+                      <button onclick="openPatientForm('${p.id}')" class="p-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                      <button onclick="printPatientSheet('${p.id}')" class="p-2 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition"><i class="fa-solid fa-print"></i></button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // MODALE FORMULAIRE PATIENT
+    function openPatientForm(patientId = null) {
+      const isEdit = Boolean(patientId);
+      const patient = isEdit ? appState.patients.find(p => p.id === patientId) : null;
+      const generatedId = isEdit ? patient.id : generateUniquePatientId();
+      const canSeeMedical = isMedicalAccessAllowed();
+      const today = new Date().toISOString().split('T')[0];
+
+      document.getElementById('modal-title').innerHTML = isEdit
+        ? `<i class="fa-solid fa-user-pen text-teal-600 mr-2"></i> ${t('modal_edit_patient')} : ${patient.firstName} ${patient.lastName}`
+        : `<i class="fa-solid fa-user-plus text-teal-600 mr-2"></i> ${t('modal_new_patient')}`;
+
+      document.getElementById('modal-body').innerHTML = `
+        <form id="patient-form" onsubmit="savePatient(event, '${isEdit ? patient.id : ''}')" class="space-y-6">
+          <div class="flex border-b border-slate-200 gap-4">
+            <button type="button" onclick="switchFormTab('personal')" id="tab-btn-personal" class="pb-3 text-sm font-bold border-b-2 border-teal-600 text-teal-700 flex items-center gap-2">
+              <i class="fa-solid fa-id-card"></i> ${t('tab_personal')}
+            </button>
+            <button type="button" onclick="switchFormTab('medical')" id="tab-btn-medical" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-notes-medical"></i> ${t('tab_medical')}
+              ${!canSeeMedical ? '<i class="fa-solid fa-lock text-amber-500 text-xs"></i>' : ''}
+            </button>
+          </div>
+
+          <div id="form-tab-personal" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_unique_id')}</label>
+              <input type="text" name="id" value="${generatedId}" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-mono font-bold text-teal-700" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#0F4C81] mb-1"><i class="fa-solid fa-address-card mr-1"></i> ${t('f_nin')} *</label>
+              <input type="text" name="nin" required value="${patient?.nin || ''}" placeholder="Ex: 1754198400412" class="w-full px-3.5 py-2.5 border border-blue-200 bg-blue-50/40 rounded-xl text-sm font-mono font-semibold focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_lastname')} *</label>
+              <input type="text" name="lastName" required value="${patient?.lastName || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_firstname')} *</label>
+              <input type="text" name="firstName" required value="${patient?.firstName || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_gender')} *</label>
+              <select name="gender" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                <option value="Féminin" ${patient?.gender === 'Féminin' ? 'selected' : ''}>${t('gender_f')}</option>
+                <option value="Masculin" ${patient?.gender === 'Masculin' ? 'selected' : ''}>${t('gender_m')}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_birthdate')} *</label>
+              <input type="date" name="birthDate" required value="${patient?.birthDate || ''}" onchange="document.getElementById('auto-age-preview').value = calculateAge(this.value)" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_age_auto')}</label>
+              <input type="text" id="auto-age-preview" value="${patient ? calculateAge(patient.birthDate) : '—'}" readonly class="w-full px-3.5 py-2.5 bg-teal-50/70 border border-teal-200 rounded-xl text-sm font-bold text-teal-800" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_address')} *</label>
+              <input type="text" name="address" required value="${patient?.address || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_phone')} *</label>
+              <input type="tel" name="phone" required value="${patient?.phone || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_email')}</label>
+              <input type="email" name="email" value="${patient?.email || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_profession')}</label>
+              <input type="text" name="profession" value="${patient?.profession || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_emergency')} *</label>
+              <input type="text" name="emergencyContact" required value="${patient?.emergencyContact || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_admission_date')} *</label>
+              <input type="date" name="admissionDate" required value="${patient?.admissionDate || today}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_care_status')}</label>
+              <select name="status" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white font-semibold focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                ${['En traitement', 'Hospitalisé', 'Guéri', 'Sorti', 'Transféré'].map(s =>
+                  `<option value="${s}" ${patient?.status === s ? 'selected' : ''}>${translateStatus(s)}</option>`
+                ).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-rose-700 mb-1"><i class="fa-solid fa-droplet mr-1"></i> ${t('f_blood_group')}</label>
+              <select name="bloodGroup" class="w-full px-3.5 py-2.5 border border-rose-200 bg-rose-50/30 rounded-xl text-sm font-bold text-rose-800 focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                ${['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'Non renseigné'].map(bg =>
+                  `<option value="${bg}" ${(patient?.bloodGroup || 'O+') === bg ? 'selected' : ''}>${bg}</option>`
+                ).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_insurance')}</label>
+              <input type="text" name="insurance" value="${patient?.insurance || ''}" placeholder="Ex: IPM / Mutuelle — N°..." class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_room_bed')}</label>
+              <input type="text" name="roomBed" value="${patient?.roomBed || ''}" placeholder="Ex: Ambulatoire / Ch. 102" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+            </div>
+          </div>
+
+          <div id="form-tab-medical" class="hidden space-y-4">
+            ${!canSeeMedical ? `
+              <div class="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-2">
+                <i class="fa-solid fa-user-shield text-3xl text-amber-600"></i>
+                <h4 class="font-bold text-amber-900">${t('restricted_title')}</h4>
+                <p class="text-sm text-amber-800 max-w-md mx-auto">${t('restricted_desc')}</p>
+              </div>
+            ` : `
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-teal-50/60 border border-teal-200/80">
+                <div>
+                  <label class="block text-xs font-bold text-teal-900 mb-1"><i class="fa-solid fa-heart-pulse mr-1"></i> ${t('f_vitals_bp')}</label>
+                  <input type="text" name="bloodPressure" value="${patient?.bloodPressure || '120/80 mmHg'}" class="w-full px-3 py-2 bg-white border border-teal-200 rounded-xl text-sm font-semibold focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-teal-900 mb-1"><i class="fa-solid fa-temperature-half mr-1"></i> ${t('f_vitals_temp')}</label>
+                  <input type="text" name="temperature" value="${patient?.temperature || '37.0 °C'}" class="w-full px-3 py-2 bg-white border border-teal-200 rounded-xl text-sm font-semibold focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-teal-900 mb-1"><i class="fa-solid fa-weight-scale mr-1"></i> ${t('f_vitals_weight')}</label>
+                  <input type="text" name="weight" value="${patient?.weight || ''}" placeholder="Ex: 70 kg" class="w-full px-3 py-2 bg-white border border-teal-200 rounded-xl text-sm font-semibold focus:outline-none" />
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_reason')}</label>
+                  <input type="text" name="reason" value="${patient?.reason || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_disease')}</label>
+                  <input type="text" name="disease" value="${patient?.disease || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_symptoms')}</label>
+                  <textarea name="symptoms" rows="2" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">${patient?.symptoms || ''}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_history')}</label>
+                  <textarea name="medicalHistory" rows="2" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">${patient?.medicalHistory || ''}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-rose-600 mb-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${t('f_allergies')}</label>
+                  <input type="text" name="allergies" value="${patient?.allergies || ''}" class="w-full px-3.5 py-2.5 border border-rose-200 bg-rose-50/30 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_exams')}</label>
+                  <input type="text" name="exams" value="${patient?.exams || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_diagnosis')}</label>
+                  <textarea name="diagnosis" rows="2" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">${patient?.diagnosis || ''}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_treatment')}</label>
+                  <textarea name="treatment" rows="2" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">${patient?.treatment || ''}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_medications')}</label>
+                  <textarea name="medications" rows="2" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">${patient?.medications || ''}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_treatment_start')}</label>
+                  <input type="date" name="treatmentStartDate" value="${patient?.treatmentStartDate || today}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_followup_date')}</label>
+                  <input type="date" name="followUpDate" value="${patient?.followUpDate || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_discharge_date')}</label>
+                  <input type="date" name="dischargeDate" value="${patient?.dischargeDate || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_evolution')}</label>
+                  <input type="text" name="healthEvolution" value="${patient?.healthEvolution || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none" />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_observations')}</label>
+                  <textarea name="observations" rows="2" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">${patient?.observations || ''}</textarea>
+                </div>
+              </div>
+            `}
+          </div>
+
+          <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+            <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">${t('cancel')}</button>
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold shadow-sm flex items-center gap-2 transition">
+              <i class="fa-solid fa-floppy-disk"></i> ${isEdit ? t('save_changes_btn') : t('create_patient_btn')}
+            </button>
+          </div>
+        </form>
+      `;
+
+      openModal();
+    }
+
+    function switchFormTab(tab) {
+      const pTab = document.getElementById('form-tab-personal');
+      const mTab = document.getElementById('form-tab-medical');
+      const pBtn = document.getElementById('tab-btn-personal');
+      const mBtn = document.getElementById('tab-btn-medical');
+
+      if (tab === 'personal') {
+        pTab.classList.remove('hidden'); mTab.classList.add('hidden');
+        pBtn.className = 'pb-3 text-sm font-bold border-b-2 border-teal-600 text-teal-700 flex items-center gap-2';
+        mBtn.className = 'pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2';
+      } else {
+        pTab.classList.add('hidden'); mTab.classList.remove('hidden');
+        mBtn.className = 'pb-3 text-sm font-bold border-b-2 border-teal-600 text-teal-700 flex items-center gap-2';
+        pBtn.className = 'pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2';
+      }
+    }
+
+    function savePatient(event, existingId) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const data = Object.fromEntries(formData.entries());
+      const canSeeMedical = isMedicalAccessAllowed();
+
+      if (existingId) {
+        const idx = appState.patients.findIndex(p => p.id === existingId);
+        if (idx !== -1) {
+          const prev = appState.patients[idx];
+          appState.patients[idx] = {
+            ...prev,
+            ...data,
+            ...(canSeeMedical ? {} : {
+              reason: prev.reason, disease: prev.disease, symptoms: prev.symptoms,
+              medicalHistory: prev.medicalHistory, allergies: prev.allergies, exams: prev.exams,
+              diagnosis: prev.diagnosis, treatment: prev.treatment, medications: prev.medications,
+              treatmentStartDate: prev.treatmentStartDate, followUpDate: prev.followUpDate,
+              dischargeDate: prev.dischargeDate, healthEvolution: prev.healthEvolution, observations: prev.observations
+            })
+          };
+          addAuditLog('Modification Patient', `${existingId} — ${data.firstName} ${data.lastName}`);
+          showToast(t('toast_patient_updated'));
+        }
+      } else {
+        const newPatient = {
+          id: data.id,
+          nin: (data.nin || '').trim(),
+          bloodGroup: data.bloodGroup || 'O+',
+          insurance: data.insurance || '',
+          roomBed: data.roomBed || 'Ambulatoire',
+          lastName: data.lastName,
+          firstName: data.firstName,
+          gender: data.gender,
+          birthDate: data.birthDate,
+          address: data.address,
+          phone: data.phone,
+          email: data.email || '',
+          profession: data.profession || '',
+          emergencyContact: data.emergencyContact,
+          status: data.status || 'En traitement',
+          admissionDate: data.admissionDate,
+          bloodPressure: canSeeMedical ? (data.bloodPressure || '120/80 mmHg') : '120/80 mmHg',
+          temperature: canSeeMedical ? (data.temperature || '37.0 °C') : '37.0 °C',
+          weight: canSeeMedical ? (data.weight || '') : '',
+          reason: canSeeMedical ? (data.reason || 'Consultation') : 'En attente',
+          disease: canSeeMedical ? (data.disease || '') : '',
+          symptoms: canSeeMedical ? (data.symptoms || '') : '',
+          medicalHistory: canSeeMedical ? (data.medicalHistory || '') : '',
+          allergies: canSeeMedical ? (data.allergies || '') : '',
+          exams: canSeeMedical ? (data.exams || '') : '',
+          diagnosis: canSeeMedical ? (data.diagnosis || '') : '',
+          treatment: canSeeMedical ? (data.treatment || '') : '',
+          medications: canSeeMedical ? (data.medications || '') : '',
+          treatmentStartDate: canSeeMedical ? (data.treatmentStartDate || '') : '',
+          followUpDate: canSeeMedical ? (data.followUpDate || '') : '',
+          dischargeDate: canSeeMedical ? (data.dischargeDate || '') : '',
+          healthEvolution: canSeeMedical ? (data.healthEvolution || '') : '',
+          observations: canSeeMedical ? (data.observations || '') : '',
+          createdAt: new Date().toISOString()
+        };
+        appState.patients.unshift(newPatient);
+        addAuditLog('Création Patient', `${newPatient.id} — ${newPatient.firstName} ${newPatient.lastName}`);
+        showToast(t('toast_patient_created'));
+      }
+
+      saveState();
+      closeModal();
+      renderCurrentView();
+    }
+
+    // MODALE DÉTAIL DU DOSSIER INDIVIDUEL
+    function openPatientDetails(patientId) {
+      const p = appState.patients.find(item => item.id === patientId);
+      if (!p) return;
+
+      const canSeeMedical = isMedicalAccessAllowed();
+      const patientConsultations = appState.consultations.filter(c => c.patientId === p.id);
+
+      addAuditLog('Consultation Dossier', `${p.id} — ${p.firstName} ${p.lastName}`);
+
+      document.getElementById('modal-title').innerHTML = `
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-1 rounded-lg bg-teal-100 text-teal-800 font-mono text-xs font-bold">${p.id}</span>
+          <span>${t('dossier_title')} — ${p.firstName} ${p.lastName}</span>
+        </div>
+      `;
+
+      document.getElementById('modal-body').innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <div class="flex flex-wrap items-center gap-2.5">
+            ${getStatusBadge(p.status)}
+            <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-[#0F4C81] border border-blue-200 font-mono text-xs font-bold">NIN: ${p.nin || '—'}</span>
+            <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 text-xs font-extrabold"><i class="fa-solid fa-droplet mr-1"></i> ${p.bloodGroup || 'O+'}</span>
+            <span class="text-xs text-slate-500">${t('admitted_on')} : <strong>${p.admissionDate || '—'}</strong></span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            ${canSeeMedical ? `
+              <button onclick="openConsultationForm('${p.id}')" class="px-3 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-plus"></i> ${t('add_consultation_btn')}
+              </button>
+              <button onclick="printPatientPrescription('${p.id}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-prescription"></i> ${t('btn_print_prescription')}
+              </button>
+            ` : ''}
+            <button onclick="printPatientHealthCard('${p.id}')" class="px-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-id-badge"></i> ${t('btn_print_card')}
+            </button>
+            <button onclick="openPatientForm('${p.id}')" class="px-3 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-pen"></i> ${t('edit')}
+            </button>
+            <button onclick="printPatientSheet('${p.id}')" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-print"></i> ${t('print_sheet_btn')}
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+          <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-2.5">
+            <i class="fa-solid fa-address-card text-teal-600"></i> ${t('section_personal_info')}
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+            <div><span class="text-slate-400 block">${t('f_nin')}</span><strong class="font-mono text-slate-800 text-sm">${p.nin || '—'}</strong></div>
+            <div><span class="text-slate-400 block">${t('col_age_sex')}</span><strong class="text-slate-800">${calculateAge(p.birthDate)} (${p.gender === 'Féminin' ? t('gender_f') : t('gender_m')})</strong></div>
+            <div><span class="text-slate-400 block">${t('f_phone')}</span><strong class="text-slate-800">${p.phone}</strong></div>
+            <div><span class="text-slate-400 block">${t('f_insurance')}</span><strong class="text-slate-800">${p.insurance || '—'}</strong></div>
+            <div><span class="text-slate-400 block">${t('f_room_bed')}</span><strong class="text-slate-800">${p.roomBed || 'Ambulatoire'}</strong></div>
+            <div><span class="text-slate-400 block">${t('f_emergency')}</span><strong class="text-rose-700">${p.emergencyContact}</strong></div>
+            <div class="sm:col-span-3"><span class="text-slate-400 block">${t('f_address')}</span><strong class="text-slate-800">${p.address}</strong></div>
+          </div>
+        </div>
+
+        ${!canSeeMedical ? `
+          <div class="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-center">
+            <i class="fa-solid fa-lock text-amber-600 text-xl mb-1"></i>
+            <p class="text-sm font-bold text-amber-900">${t('restricted_title')}</p>
+            <p class="text-xs text-amber-800 mt-1">${t('restricted_desc')}</p>
+          </div>
+        ` : `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-2.5">
+              <i class="fa-solid fa-heart-pulse text-rose-600"></i> ${t('section_medical_info')}
+            </h4>
+            <div class="grid grid-cols-3 gap-3 bg-teal-50/60 p-3 rounded-xl border border-teal-100 text-center">
+              <div><span class="text-[11px] text-slate-500 block">${t('f_vitals_bp')}</span><strong class="text-sm font-extrabold text-[#0F4C81]">${p.bloodPressure || '120/80 mmHg'}</strong></div>
+              <div><span class="text-[11px] text-slate-500 block">${t('f_vitals_temp')}</span><strong class="text-sm font-extrabold text-teal-700">${p.temperature || '37.0 °C'}</strong></div>
+              <div><span class="text-[11px] text-slate-500 block">${t('f_vitals_weight')}</span><strong class="text-sm font-extrabold text-slate-800">${p.weight || '—'}</strong></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="p-3 rounded-xl bg-rose-50/60 border border-rose-200"><span class="text-rose-600 font-bold block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${t('f_allergies')}</span><strong class="text-rose-900">${p.allergies || 'Aucune'}</strong></div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><span class="text-slate-500 font-bold block">${t('f_disease')}</span><strong class="text-slate-900">${p.disease || '—'}</strong></div>
+              <div><span class="text-slate-400 block">${t('f_diagnosis')}</span><strong class="text-slate-800">${p.diagnosis || '—'}</strong></div>
+              <div><span class="text-slate-400 block">${t('f_treatment')}</span><strong class="text-slate-800">${p.treatment || '—'}</strong></div>
+              <div class="sm:col-span-2"><span class="text-slate-400 block">${t('f_medications')}</span><strong class="text-teal-800">${p.medications || '—'}</strong></div>
+              <div class="sm:col-span-2"><span class="text-slate-400 block">${t('f_observations')}</span><p class="text-slate-700 font-medium">${p.observations || '—'}</p></div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-stethoscope text-indigo-600"></i> ${t('section_history_consult')} (${patientConsultations.length})
+            </h4>
+            ${patientConsultations.length === 0 ? `<p class="text-xs text-slate-500">${t('no_consult_history')}</p>` : `
+              <div class="space-y-2.5">
+                ${patientConsultations.map(c => `
+                  <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+                    <div class="flex justify-between font-bold text-slate-800">
+                      <span>${c.date.replace('T', ' ')} — ${c.doctor}</span>
+                      <span class="text-teal-700">${c.diagnosis}</span>
+                    </div>
+                    <p class="text-slate-600"><strong>Rx :</strong> ${c.prescriptions}</p>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+          </div>
+        `}
+      `;
+
+      openModal();
+    }
+
+    function printPatientSheet(patientId) {
+      const p = appState.patients.find(item => item.id === patientId);
+      if (!p) return;
+      const canSeeMedical = isMedicalAccessAllowed();
+      const printArea = document.getElementById('print-area');
+      printArea.innerHTML = `
+        <div class="p-6 space-y-5 font-sans">
+          <div class="border-b-2 border-slate-900 pb-4 flex justify-between items-center">
+            <div>
+              <h1 class="text-2xl font-extrabold">CLINIQUE SANTÉPLUS — FICHE PATIENT</h1>
+              <p class="text-xs text-slate-600">ID: <strong>${p.id}</strong> • NIN: <strong>${p.nin || '—'}</strong> • Groupe Sanguin: <strong>${p.bloodGroup || 'O+'}</strong></p>
+            </div>
+            <div class="text-right text-xs">
+              <p class="font-bold">${translateStatus(p.status)}</p>
+              <p>${t('admitted_on')}: ${p.admissionDate || '—'}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-xs border p-4 rounded-xl">
+            <p><strong>${t('col_patient')} :</strong> ${p.lastName.toUpperCase()} ${p.firstName}</p>
+            <p><strong>${t('col_age_sex')} :</strong> ${calculateAge(p.birthDate)} (${p.gender})</p>
+            <p><strong>${t('f_phone')} :</strong> ${p.phone}</p>
+            <p><strong>${t('f_insurance')} :</strong> ${p.insurance || '—'}</p>
+            <p class="col-span-2"><strong>${t('f_address')} :</strong> ${p.address}</p>
+            <p class="col-span-2"><strong>${t('f_emergency')} :</strong> ${p.emergencyContact}</p>
+          </div>
+          ${canSeeMedical ? `
+            <div class="border p-4 rounded-xl space-y-2 text-xs">
+              <h2 class="font-bold text-sm border-b pb-1">${t('section_medical_info')}</h2>
+              <p><strong>Constantes :</strong> TA ${p.bloodPressure || '—'} | Temp ${p.temperature || '—'} | Poids ${p.weight || '—'}</p>
+              <p><strong>${t('f_allergies')} :</strong> ${p.allergies || 'Aucune'}</p>
+              <p><strong>${t('f_disease')} :</strong> ${p.disease || '—'}</p>
+              <p><strong>${t('f_diagnosis')} :</strong> ${p.diagnosis || '—'}</p>
+              <p><strong>${t('f_medications')} :</strong> ${p.medications || '—'}</p>
+              <p><strong>${t('f_observations')} :</strong> ${p.observations || '—'}</p>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      addAuditLog('Impression Fiche', `${p.id} — ${p.firstName} ${p.lastName}`);
+      window.print();
+    }
+
+    function printPatientPrescription(patientId) {
+      const p = appState.patients.find(item => item.id === patientId);
+      if (!p) return;
+      const printArea = document.getElementById('print-area');
+      printArea.innerHTML = `
+        <div class="p-8 space-y-6 font-sans border-2 border-slate-800 rounded-2xl">
+          <div class="flex justify-between items-start border-b-2 border-slate-800 pb-4">
+            <div>
+              <h1 class="text-2xl font-extrabold text-[#0F4C81]">CLINIQUE SANTÉPLUS</h1>
+              <p class="text-xs text-slate-600">Ziguinchor, Sénégal • Tél: +221 33 991 00 00</p>
+            </div>
+            <div class="text-right text-xs">
+              <p class="font-bold uppercase">ORDONNANCE MÉDICALE</p>
+              <p>Date : ${new Date().toLocaleDateString('fr-FR')}</p>
+            </div>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-300 text-xs grid grid-cols-2 gap-2">
+            <p><strong>Patient :</strong> ${p.firstName} ${p.lastName.toUpperCase()}</p>
+            <p><strong>ID / NIN :</strong> ${p.id} / ${p.nin || '—'}</p>
+            <p><strong>Âge / Sexe :</strong> ${calculateAge(p.birthDate)} (${p.gender})</p>
+            <p><strong>Allergies :</strong> <span class="text-rose-700 font-bold">${p.allergies || 'Aucune'}</span></p>
+          </div>
+          <div class="min-h-[220px] space-y-3 py-4">
+            <p class="text-sm font-bold underline">Prescription & Posologie :</p>
+            <p class="text-sm whitespace-pre-line leading-relaxed font-medium">${p.medications || p.treatment || 'Aucun médicament prescrit.'}</p>
+            <p class="text-xs text-slate-600 pt-4"><strong>Recommandations :</strong> ${p.observations || 'Suivre scrupuleusement le traitement.'}</p>
+          </div>
+          <div class="flex justify-between items-end pt-8 border-t border-slate-300 text-xs">
+            <p>Prochain rendez-vous : <strong>${p.followUpDate || 'À convenir'}</strong></p>
+            <div class="text-center">
+              <p class="font-bold">${USER_PROFILES[appState.currentRole].name}</p>
+              <p class="text-slate-500 mt-8">Cachet & Signature du Médecin</p>
+            </div>
+          </div>
+        </div>
+      `;
+      addAuditLog('Impression Ordonnance', `${p.id} — ${p.firstName} ${p.lastName}`);
+      window.print();
+    }
+
+    function printPatientHealthCard(patientId) {
+      const p = appState.patients.find(item => item.id === patientId);
+      if (!p) return;
+      const printArea = document.getElementById('print-area');
+      printArea.innerHTML = `
+        <div class="p-6 flex justify-center font-sans">
+          <div class="w-[420px] border-2 border-[#0F4C81] rounded-2xl overflow-hidden shadow-lg">
+            <div class="bg-[#0F4C81] text-white p-4 flex justify-between items-center">
+              <div>
+                <h2 class="font-extrabold text-base">CARTE SANTÉ PATIENT</h2>
+                <p class="text-[11px] text-teal-200">Clinique SantéPlus • Passeport Médical</p>
+              </div>
+              <span class="px-2.5 py-1 rounded bg-rose-600 text-white font-extrabold text-sm">${p.bloodGroup || 'O+'}</span>
+            </div>
+            <div class="p-4 space-y-2 text-xs bg-white">
+              <p class="text-base font-extrabold text-slate-900">${p.lastName.toUpperCase()} ${p.firstName}</p>
+              <p><strong>ID Clinique :</strong> <span class="font-mono font-bold text-teal-700">${p.id}</span></p>
+              <p><strong>N° Identité Nationale (NIN) :</strong> <span class="font-mono font-bold">${p.nin || '—'}</span></p>
+              <p><strong>Né(e) le :</strong> ${p.birthDate} (${calculateAge(p.birthDate)})</p>
+              <p><strong>Allergies majeures :</strong> <span class="text-rose-700 font-bold">${p.allergies || 'Aucune'}</span></p>
+              <p><strong>Contact d'urgence :</strong> ${p.emergencyContact}</p>
+            </div>
+          </div>
+        </div>
+      `;
+      addAuditLog('Impression Carte Santé', `${p.id} — ${p.firstName} ${p.lastName}`);
+      window.print();
+    }
+
+    // 3. CONSULTATIONS & RENDEZ-VOUS
+    function renderConsultationsView(container) {
+      const canSeeMedical = isMedicalAccessAllowed();
+      const today = new Date().toISOString().split('T')[0];
+
+      const filtered = appState.consultations.filter(c => {
+        if (appState.consultFilter === 'TODAY') return (c.date || '').startsWith(today) || c.nextAppointment === today;
+        if (appState.consultFilter === 'UPCOMING') return c.nextAppointment && c.nextAppointment >= today;
+        return true;
+      });
+
+      container.innerHTML = `
+        <div class="glass-card rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-extrabold text-slate-900">${t('consult_title')}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">${t('consult_subtitle')}</p>
+          </div>
+          <button onclick="openConsultationForm()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#0F4C81] to-teal-600 text-white text-sm font-semibold shadow-md flex items-center gap-2 self-start sm:self-auto transition">
+            <i class="fa-solid fa-notes-medical"></i> ${t('btn_new_consultation')}
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          ${[
+            { key: 'ALL', label: t('filter_consult_all') },
+            { key: 'TODAY', label: t('filter_consult_today') },
+            { key: 'UPCOMING', label: t('filter_consult_upcoming') }
+          ].map(f => `
+            <button onclick="appState.consultFilter='${f.key}'; renderConsultationsView(document.getElementById('main-content'))"
+              class="px-4 py-2 rounded-xl text-xs font-bold transition ${appState.consultFilter === f.key ? 'bg-teal-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}">
+              ${f.label}
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <th class="py-3.5 px-4">${t('col_datetime')}</th>
+                  <th class="py-3.5 px-4">${t('col_patient')}</th>
+                  <th class="py-3.5 px-4">${t('col_doctor')}</th>
+                  <th class="py-3.5 px-4">${t('col_reason_diag')}</th>
+                  <th class="py-3.5 px-4">${t('col_prescriptions')}</th>
+                  <th class="py-3.5 px-4">${t('col_next_rdv')}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-sm">
+                ${filtered.map(c => `
+                  <tr class="hover:bg-slate-50 transition">
+                    <td class="py-3.5 px-4 font-mono text-xs text-slate-600 whitespace-nowrap">${c.date.replace('T', ' ')}</td>
+                    <td class="py-3.5 px-4 font-bold text-slate-900">
+                      <button onclick="openPatientDetails('${c.patientId}')" class="hover:text-teal-600 text-left">
+                        ${c.patientName} <span class="block text-[11px] font-mono text-teal-600">${c.patientId}</span>
+                      </button>
+                    </td>
+                    <td class="py-3.5 px-4 text-xs font-semibold text-slate-700">${c.doctor}</td>
+                    <td class="py-3.5 px-4 text-xs">
+                      <p class="font-semibold text-slate-800">${c.reason}</p>
+                      <p class="text-teal-700">${canSeeMedical ? (c.diagnosis || '—') : t('confidential_locked')}</p>
+                    </td>
+                    <td class="py-3.5 px-4 text-xs text-slate-600 max-w-xs">${canSeeMedical ? (c.prescriptions || '—') : t('confidential_locked')}</td>
+                    <td class="py-3.5 px-4 whitespace-nowrap">
+                      ${c.nextAppointment ? `<span class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-xs font-bold">${c.nextAppointment}</span>` : '—'}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openConsultationForm(preselectedPatientId = '') {
+      const canSeeMedical = isMedicalAccessAllowed();
+      const nowLocal = new Date().toISOString().slice(0, 16);
+      const doctors = appState.staff.filter(s => s.accessLevel === 'doctor' || s.name.startsWith('Dr.'));
+
+      document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-stethoscope text-teal-600 mr-2"></i> ${t('modal_new_consult')}`;
+      document.getElementById('modal-body').innerHTML = `
+        <form onsubmit="saveConsultation(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('select_patient')} *</label>
+              <select name="patientId" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white">
+                ${appState.patients.map(p => `<option value="${p.id}" ${p.id === preselectedPatientId ? 'selected' : ''}>${p.id} — ${p.firstName} ${p.lastName}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('col_datetime')} *</label>
+              <input type="datetime-local" name="date" required value="${nowLocal}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('col_doctor')} *</label>
+              <select name="doctor" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white">
+                ${doctors.map(d => `<option value="${d.name}">${d.name} (${d.specialty})</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('col_next_rdv')}</label>
+              <input type="date" name="nextAppointment" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_reason')} *</label>
+              <input type="text" name="reason" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm" />
+            </div>
+            ${canSeeMedical ? `
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_observations')}</label>
+                <textarea name="observations" rows="2" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_diagnosis')}</label>
+                <input type="text" name="diagnosis" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">${t('col_prescriptions')}</label>
+                <input type="text" name="prescriptions" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm" />
+              </div>
+            ` : ''}
+          </div>
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-sm font-semibold">${t('cancel')}</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold">${t('save')}</button>
+          </div>
+        </form>
+      `;
+      openModal();
+    }
+
+    function saveConsultation(event) {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.target).entries());
+      const patient = appState.patients.find(p => p.id === data.patientId);
+      const newConsult = {
+        id: 'CONS-' + (1000 + appState.consultations.length + 1),
+        patientId: data.patientId,
+        patientName: patient ? `${patient.firstName} ${patient.lastName}` : data.patientId,
+        date: data.date,
+        doctor: data.doctor,
+        reason: data.reason,
+        observations: data.observations || '',
+        diagnosis: data.diagnosis || '',
+        prescriptions: data.prescriptions || '',
+        nextAppointment: data.nextAppointment || ''
+      };
+      appState.consultations.unshift(newConsult);
+      if (patient) {
+        if (data.nextAppointment) patient.followUpDate = data.nextAppointment;
+        if (data.diagnosis) patient.diagnosis = data.diagnosis;
+        if (data.prescriptions) patient.medications = data.prescriptions;
+      }
+      addAuditLog('Nouvelle Consultation', `${newConsult.patientId} avec ${newConsult.doctor}`);
+      saveState();
+      closeModal();
+      renderCurrentView();
+      showToast(t('toast_consult_saved'));
+    }
+
+    // 4. MÉDECINS & PERSONNEL
+    function renderStaffView(container) {
+      const isAdmin = appState.currentRole === 'admin';
+      container.innerHTML = `
+        <div class="glass-card rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-extrabold text-slate-900">${t('staff_title')}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">${t('staff_subtitle')}</p>
+          </div>
+          ${isAdmin ? `
+            <button onclick="openStaffForm()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#0F4C81] to-teal-600 text-white text-sm font-semibold shadow-md flex items-center gap-2 self-start sm:self-auto transition">
+              <i class="fa-solid fa-user-plus"></i> ${t('add_staff_btn')}
+            </button>
+          ` : ''}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          ${appState.staff.map(s => `
+            <div class="glass-card p-5 rounded-2xl space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0F4C81] to-teal-600 text-white flex items-center justify-center font-bold text-sm">
+                    ${s.name.replace('Dr. ', '').split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-slate-900 text-sm">${s.name}</h3>
+                    <p class="text-xs text-teal-700 font-semibold">${s.specialty}</p>
+                  </div>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${s.status === 'En garde' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700'}">
+                  ${s.status === 'En garde' ? t('staff_oncall') : t('staff_active')}
+                </span>
+              </div>
+              <div class="text-xs text-slate-600 space-y-1 pt-2 border-t border-slate-100">
+                <p><strong>${t('col_role_title')} :</strong> ${s.roleTitle}</p>
+                <p><strong>${t('f_phone')} :</strong> ${s.phone}</p>
+                <p><strong>${t('col_login_id')} :</strong> <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded">${s.loginId}</span></p>
+              </div>
+              ${isAdmin ? `
+                <div class="pt-2 flex justify-end">
+                  <button onclick="openStaffForm('${s.id}')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
+                    <i class="fa-solid fa-pen mr-1"></i> ${t('edit')}
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function openStaffForm(staffId = '') {
+      const member = staffId ? appState.staff.find(s => s.id === staffId) : null;
+      document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-user-doctor text-teal-600 mr-2"></i> ${member ? t('edit_staff_btn') : t('add_staff_btn')}`;
+      document.getElementById('modal-body').innerHTML = `
+        <form onsubmit="saveStaff(event, '${staffId}')" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Nom & Prénom *</label>
+              <input type="text" name="name" required value="${member?.name || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('col_specialty')} *</label>
+              <input type="text" name="specialty" required value="${member?.specialty || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('col_role_title')} *</label>
+              <input type="text" name="roleTitle" required value="${member?.roleTitle || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('f_phone')} *</label>
+              <input type="tel" name="phone" required value="${member?.phone || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('col_login_id')} *</label>
+              <input type="text" name="loginId" required value="${member?.loginId || ''}" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm font-mono" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">${t('staff_status_label')}</label>
+              <select name="status" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white">
+                <option value="Actif" ${member?.status === 'Actif' ? 'selected' : ''}>${t('staff_active')}</option>
+                <option value="En garde" ${member?.status === 'En garde' ? 'selected' : ''}>${t('staff_oncall')}</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-sm font-semibold">${t('cancel')}</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold">${t('save')}</button>
+          </div>
+        </form>
+      `;
+      openModal();
+    }
+
+    function saveStaff(event, existingId) {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.target).entries());
+      if (existingId) {
+        const idx = appState.staff.findIndex(s => s.id === existingId);
+        if (idx !== -1) appState.staff[idx] = { ...appState.staff[idx], ...data };
+      } else {
+        appState.staff.push({ id: 'STF-' + Date.now(), accessLevel: 'doctor', ...data });
+      }
+      addAuditLog('Gestion Personnel', data.name);
+      saveState();
+      closeModal();
+      renderCurrentView();
+      showToast(t('toast_staff_added'));
+    }
+
+    // 5. STATISTIQUES & RAPPORTS
+    function renderStatsView(container) {
+      container.innerHTML = `
+        <div class="hero-banner rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-white">
+          <div>
+            <h2 class="text-2xl font-extrabold">${t('stats_title')}</h2>
+            <p class="text-sm text-blue-100 mt-0.5">${t('stats_subtitle')}</p>
+          </div>
+          <div class="flex flex-wrap gap-2.5">
+            <button onclick="exportPatientsCSV()" class="px-4 py-2.5 rounded-xl bg-white text-[#0F4C81] hover:bg-teal-50 text-sm font-bold shadow-md flex items-center gap-2 transition">
+              <i class="fa-solid fa-file-excel text-emerald-600"></i> ${t('export_excel_btn')}
+            </button>
+            <button onclick="printStatsReport()" class="px-4 py-2.5 rounded-xl bg-teal-500/30 hover:bg-teal-500/40 text-white border border-white/25 text-sm font-semibold flex items-center gap-2 transition">
+              <i class="fa-solid fa-file-pdf"></i> ${t('export_pdf_btn')}
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="glass-card p-4 rounded-2xl border-l-4 border-l-[#0F4C81]">
+            <p class="text-[11px] font-bold uppercase text-slate-400">${t('gender_m')}</p>
+            <p class="text-2xl font-extrabold text-slate-900 mt-0.5">${appState.patients.filter(p => p.gender === 'Masculin').length}</p>
+          </div>
+          <div class="glass-card p-4 rounded-2xl border-l-4 border-l-pink-500">
+            <p class="text-[11px] font-bold uppercase text-slate-400">${t('gender_f')}</p>
+            <p class="text-2xl font-extrabold text-slate-900 mt-0.5">${appState.patients.filter(p => p.gender === 'Féminin').length}</p>
+          </div>
+          <div class="glass-card p-4 rounded-2xl border-l-4 border-l-emerald-500">
+            <p class="text-[11px] font-bold uppercase text-slate-400">${t('kpi_recovered')}</p>
+            <p class="text-2xl font-extrabold text-emerald-600 mt-0.5">${appState.patients.filter(p => p.status === 'Guéri' || p.status === 'Sorti').length}</p>
+          </div>
+          <div class="glass-card p-4 rounded-2xl border-l-4 border-l-rose-500">
+            <p class="text-[11px] font-bold uppercase text-slate-400">${t('kpi_hospitalized')}</p>
+            <p class="text-2xl font-extrabold text-rose-600 mt-0.5">${appState.patients.filter(p => p.status === 'Hospitalisé').length}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-wave-square text-teal-600"></i> ${t('chart_diseases')}</h3>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700">Courbe</span>
+            </div>
+            <div class="h-64"><canvas id="statsDiseaseChart"></canvas></div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-pyramid text-[#0F4C81]"></i> ${t('chart_ages')}</h3>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0F4C81]">Pyramide</span>
+            </div>
+            <div class="h-64"><canvas id="statsAgeChart"></canvas></div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-layer-group text-indigo-600"></i> ${t('chart_gender')}</h3>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700">Pyramide</span>
+            </div>
+            <div class="h-64 flex items-center justify-center"><canvas id="statsGenderChart"></canvas></div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-chart-line text-emerald-600"></i> ${t('chart_outcomes')}</h3>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Courbe</span>
+            </div>
+            <div class="h-64"><canvas id="statsOutcomesChart"></canvas></div>
+          </div>
+        </div>
+      `;
+
+      initStatsCharts();
+    }
+
+    function initStatsCharts() {
+      ['stat1', 'stat2', 'stat3', 'stat4'].forEach(k => {
+        if (chartsInstances[k]) chartsInstances[k].destroy();
+      });
+
+      // 1. Courbe fluide des maladies les plus fréquentes
+      const diseaseCounts = {};
+      appState.patients.forEach(p => {
+        const d = p.disease || 'Autre';
+        diseaseCounts[d] = (diseaseCounts[d] || 0) + 1;
+      });
+      chartsInstances.stat1 = new Chart(document.getElementById('statsDiseaseChart'), {
+        type: 'line',
+        data: {
+          labels: Object.keys(diseaseCounts),
+          datasets: [{
+            label: 'Patients',
+            data: Object.values(diseaseCounts),
+            borderColor: '#0D9488',
+            backgroundColor: 'rgba(13, 148, 136, 0.16)',
+            pointBackgroundColor: '#0F4C81',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            borderWidth: 3,
+            fill: true,
+            tension: 0.42
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 2. Pyramide des âges symétrique (Hommes à gauche, Femmes à droite)
+      const ageLabels = ['65+', '50-64', '30-49', '15-29', '0-14'];
+      const malePyramid = { '0-14': 0, '15-29': 0, '30-49': 0, '50-64': 0, '65+': 0 };
+      const femalePyramid = { '0-14': 0, '15-29': 0, '30-49': 0, '50-64': 0, '65+': 0 };
+
+      appState.patients.forEach(p => {
+        const age = getNumericAge(p.birthDate);
+        if (age === null) return;
+        let bucket = '65+';
+        if (age <= 14) bucket = '0-14';
+        else if (age <= 29) bucket = '15-29';
+        else if (age <= 49) bucket = '30-49';
+        else if (age <= 64) bucket = '50-64';
+
+        if (p.gender === 'Féminin') femalePyramid[bucket]++;
+        else malePyramid[bucket]++;
+      });
+
+      chartsInstances.stat2 = new Chart(document.getElementById('statsAgeChart'), {
+        type: 'bar',
+        data: {
+          labels: ageLabels.map(k => `${k} ${t('years_old')}`),
+          datasets: [
+            {
+              label: t('gender_m'),
+              data: ageLabels.map(k => -malePyramid[k]),
+              backgroundColor: '#0F4C81',
+              borderRadius: 6
+            },
+            {
+              label: t('gender_f'),
+              data: ageLabels.map(k => femalePyramid[k]),
+              backgroundColor: '#ec4899',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 11, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.dataset.label}: ${Math.abs(ctx.raw)}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              stacked: true,
+              ticks: {
+                stepSize: 1,
+                callback: v => Math.abs(v)
+              },
+              grid: { color: '#f1f5f9' }
+            },
+            y: {
+              stacked: true,
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      // 3. Pyramide clinique hiérarchique + Répartition par sexe
+      const totalP = appState.patients.length;
+      const maleCount = appState.patients.filter(p => p.gender === 'Masculin').length;
+      const femaleCount = appState.patients.filter(p => p.gender === 'Féminin').length;
+      const recovP = appState.patients.filter(p => p.status === 'Guéri' || p.status === 'Sorti').length;
+      const hospP = appState.patients.filter(p => p.status === 'Hospitalisé').length;
+
+      const pyramidTiers = [
+        { label: t('status_hospitalized'), val: hospP },
+        { label: t('status_recovered'), val: recovP },
+        { label: `${t('gender_m')} / ${t('gender_f')}`, val: Math.max(maleCount, femaleCount) },
+        { label: t('kpi_total_patients'), val: totalP }
+      ];
+
+      chartsInstances.stat3 = new Chart(document.getElementById('statsGenderChart'), {
+        type: 'bar',
+        data: {
+          labels: pyramidTiers.map(item => item.label),
+          datasets: [{
+            label: 'Patients',
+            data: pyramidTiers.map(item => [-item.val / 2, item.val / 2]),
+            backgroundColor: ['#f43f5e', '#10b981', '#0D9488', '#0F4C81'],
+            borderRadius: 10,
+            borderSkipped: false,
+            barPercentage: 0.78
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ctx.dataIndex === 2
+                  ? `${t('gender_m')}: ${maleCount} | ${t('gender_f')}: ${femaleCount}`
+                  : `${ctx.label}: ${Math.round(ctx.raw[1] - ctx.raw[0])} patients`
+              }
+            }
+          },
+          scales: {
+            x: {
+              display: false,
+              min: -(Math.max(totalP, 4) / 2 + 0.5),
+              max: (Math.max(totalP, 4) / 2 + 0.5)
+            },
+            y: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 11 } } }
+          }
+        }
+      });
+
+      // 4. Courbes comparatives mensuelles : Guérisons, Hospitalisations & Consultations
+      const monthsByLang = {
+        fr: ['Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'],
+        en: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        pt: ['Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+      };
+      chartsInstances.stat4 = new Chart(document.getElementById('statsOutcomesChart'), {
+        type: 'line',
+        data: {
+          labels: monthsByLang[appState.lang],
+          datasets: [
+            {
+              label: t('status_recovered'),
+              data: [2, 3, 4, 5, recovP + 3, 2],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.14)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4
+            },
+            {
+              label: t('status_hospitalized'),
+              data: [1, 2, 1, 2, hospP + 1, 1],
+              borderColor: '#f43f5e',
+              backgroundColor: 'rgba(244, 63, 94, 0.10)',
+              borderWidth: 2.5,
+              fill: true,
+              tension: 0.4
+            },
+            {
+              label: t('nav_consultations'),
+              data: [6, 8, 9, 12, appState.consultations.length + 7, 5],
+              borderColor: '#0F4C81',
+              borderWidth: 2.5,
+              fill: false,
+              tension: 0.4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'top', labels: { boxWidth: 11, font: { size: 11 } } } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function exportPatientsCSV() {
+      const canSeeMedical = isMedicalAccessAllowed();
+      const headers = ['ID', 'NIN', 'Nom', 'Prenom', 'Sexe', 'DateNaissance', 'Telephone', 'Adresse', 'Statut', 'DateAdmission'];
+      if (canSeeMedical) headers.push('Pathologie', 'Diagnostic', 'Traitement');
+
+      const rows = appState.patients.map(p => {
+        const base = [p.id, `"${p.nin || ''}"`, p.lastName, p.firstName, p.gender, p.birthDate, p.phone, `"${p.address}"`, p.status, p.admissionDate];
+        if (canSeeMedical) base.push(`"${p.disease || ''}"`, `"${p.diagnosis || ''}"`, `"${p.treatment || ''}"`);
+        return base.join(';');
+      });
+
+      const csvContent = '\uFEFF' + [headers.join(';'), ...rows].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Clinique_SantePlus_Rapport_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      addAuditLog('Export Excel/CSV', 'Exportation de la liste des patients');
+      showToast(t('toast_csv_exported'));
+    }
+
+    function printStatsReport() {
+      const printArea = document.getElementById('print-area');
+      printArea.innerHTML = `
+        <div class="p-6 space-y-6 font-sans">
+          <div class="border-b-2 border-slate-900 pb-4 flex justify-between items-center">
+            <div>
+              <h1 class="text-2xl font-extrabold">CLINIQUE SANTÉPLUS — ${t('stats_title')}</h1>
+              <p class="text-xs text-slate-600">${new Date().toLocaleString()}</p>
+            </div>
+            <span class="text-xs font-bold border border-slate-800 px-3 py-1">MediCore Pro</span>
+          </div>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="p-3 border rounded-lg"><strong>${appState.patients.length}</strong><br/><span class="text-xs">${t('kpi_total_patients')}</span></div>
+            <div class="p-3 border rounded-lg"><strong>${appState.patients.filter(p => p.status === 'Hospitalisé').length}</strong><br/><span class="text-xs">${t('kpi_hospitalized')}</span></div>
+            <div class="p-3 border rounded-lg"><strong>${appState.patients.filter(p => p.status === 'Guéri' || p.status === 'Sorti').length}</strong><br/><span class="text-xs">${t('kpi_recovered')}</span></div>
+          </div>
+          <table class="w-full text-xs border-collapse border border-slate-300">
+            <thead>
+              <tr class="bg-slate-100">
+                <th class="border border-slate-300 p-2 text-left">ID</th>
+                <th class="border border-slate-300 p-2 text-left">NIN</th>
+                <th class="border border-slate-300 p-2 text-left">${t('col_patient')}</th>
+                <th class="border border-slate-300 p-2 text-left">${t('col_age_sex')}</th>
+                <th class="border border-slate-300 p-2 text-left">${t('col_status')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${appState.patients.map(p => `
+                <tr>
+                  <td class="border border-slate-300 p-2 font-mono">${p.id}</td>
+                  <td class="border border-slate-300 p-2 font-mono">${p.nin || '—'}</td>
+                  <td class="border border-slate-300 p-2">${p.lastName} ${p.firstName}</td>
+                  <td class="border border-slate-300 p-2">${calculateAge(p.birthDate)} (${p.gender})</td>
+                  <td class="border border-slate-300 p-2">${translateStatus(p.status)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      addAuditLog('Impression Rapport', 'Impression rapport statistique PDF');
+      window.print();
+    }
+
+    // 6. SÉCURITÉ & JOURNAL D'AUDIT
+    function renderSecurityView(container) {
+      container.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-900">${t('security_title')}</h2>
+            <p class="text-sm text-slate-500">${t('security_subtitle')}</p>
+          </div>
+          <div class="flex flex-wrap gap-2.5">
+            <label class="px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-sm font-semibold shadow-2xs flex items-center gap-2 cursor-pointer transition">
+              <i class="fa-solid fa-upload text-teal-600"></i> ${t('backup_restore_btn')}
+              <input type="file" accept=".json" onchange="importJSONBackup(event)" class="hidden" />
+            </label>
+            <button onclick="downloadJSONBackup()" class="px-4 py-2.5 rounded-xl bg-[#0F4C81] hover:opacity-95 text-white text-sm font-semibold shadow-sm flex items-center gap-2 transition">
+              <i class="fa-solid fa-download"></i> ${t('backup_download_btn')}
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-check text-teal-600"></i> ${t('audit_log_title')}</h3>
+            <span class="text-xs font-mono text-slate-400">${appState.auditLogs.length} entrées</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <th class="py-3 px-4">${t('col_timestamp')}</th>
+                  <th class="py-3 px-4">${t('col_user')}</th>
+                  <th class="py-3 px-4">${t('col_action')}</th>
+                  <th class="py-3 px-4">${t('col_details')}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-xs sm:text-sm">
+                ${appState.auditLogs.map(log => `
+                  <tr class="hover:bg-slate-50">
+                    <td class="py-3 px-4 font-mono text-xs text-slate-500 whitespace-nowrap">${log.timestamp}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">${log.user}</td>
+                    <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-teal-50 text-teal-700 font-semibold text-xs">${log.action}</span></td>
+                    <td class="py-3 px-4 text-slate-600">${log.details}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function downloadJSONBackup() {
+      const backup = {
+        exportedAt: new Date().toISOString(),
+        platform: 'Clinique SantéPlus MediCore Pro',
+        patients: appState.patients,
+        consultations: appState.consultations,
+        staff: appState.staff,
+        auditLogs: appState.auditLogs
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Backup_Clinique_SantePlus_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      addAuditLog('Sauvegarde JSON', 'Téléchargement complet de la base');
+      showToast(t('toast_backup_exported'));
+    }
+
+    function importJSONBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (Array.isArray(parsed.patients) && Array.isArray(parsed.consultations)) {
+            appState.patients = parsed.patients;
+            appState.consultations = parsed.consultations;
+            if (Array.isArray(parsed.staff)) appState.staff = parsed.staff;
+            if (Array.isArray(parsed.auditLogs)) appState.auditLogs = parsed.auditLogs;
+            addAuditLog('Restauration JSON', `Importation depuis ${file.name}`);
+            saveState();
+            renderCurrentView();
+            showToast(t('toast_backup_restored'));
+          }
+        } catch (err) {
+          showToast('Fichier JSON invalide', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ============================================================================
+    // MODALES UTILITAIRES (OUVERTURE, FERMETURE, RÉINITIALISATION)
+    // ============================================================================
+    function openModal() {
+      const backdrop = document.getElementById('modal-backdrop');
+      backdrop.classList.remove('hidden');
+      backdrop.classList.add('flex');
+    }
+
+    function closeModal() {
+      const backdrop = document.getElementById('modal-backdrop');
+      backdrop.classList.add('hidden');
+      backdrop.classList.remove('flex');
+    }
+
+    function openResetModal() {
+      document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i> ${t('reset_confirm_title')}`;
+      document.getElementById('modal-body').innerHTML = `
+        <p class="text-sm text-slate-600">${t('reset_confirm_desc')}</p>
+        <div class="flex justify-end gap-3 pt-4">
+          <button onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-sm font-semibold">${t('cancel')}</button>
+          <button onclick="confirmResetDemo()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold">${t('reset_confirm_btn')}</button>
+        </div>
+      `;
+      openModal();
+    }
+
+    function confirmResetDemo() {
+      const demo = getInitialDemoData();
+      appState.patients = demo.patients;
+      appState.consultations = demo.consultations;
+      appState.staff = demo.staff;
+      appState.auditLogs = demo.auditLogs;
+      saveState();
+      closeModal();
+      renderCurrentView();
+      showToast(t('reset_demo'));
+    }
+
+    // ============================================================================
+    // INITIALISATION AU CHARGEMENT
+    // ============================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      applyStaticTranslations();
+      if (appState.isAuthenticated) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('login-screen').classList.remove('flex');
+        switchUserRole(appState.currentRole);
+      } else {
+        openLoginScreen();
+      }
+      navigateTo('dashboard');
+    });
+  </script>
+</body>
+</html>
